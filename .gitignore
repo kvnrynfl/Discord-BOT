@@ -1,7 +1,4 @@
 /node_modules
-commands/admin/*.js
-commands/general/*.js
-commands/music/*.js
 deploy-commands.js
 destroy-commands.js
 config.json
