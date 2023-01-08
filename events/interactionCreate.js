@@ -14,11 +14,15 @@ module.exports = {
 		}
 
 		try {
+			await interaction.deferReply();
 			await command.execute(interaction);
 		} catch (error) {
 			console.error(`Error executing ${interaction.commandName}`);
 			console.error(error);
+			await interaction.editReply({
+                content: ":x: | An error occurred",
+                ephemeral: true,
+            });
 		}
-		// console.log(interaction);
 	},
 };
