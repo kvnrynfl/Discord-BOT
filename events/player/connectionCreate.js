@@ -2,6 +2,6 @@ module.exports = {
 	name: 'conectionCreate',
 	once: false,
 	execute() {
-        console.log('Successfully created connection!');
+        console.log('Player Log : Successfully created connection!');
 	},
 };

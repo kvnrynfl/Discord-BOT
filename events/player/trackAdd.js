@@ -2,6 +2,6 @@ module.exports = {
 	name: 'trackAdd',
 	once: false,
 	execute(track) {
-		console.log(`Track ${track.title} added in the queue ✅`);
+		console.log(`Player Log : Track ${track.title} added in the queue ✅`);
 	},
 };
