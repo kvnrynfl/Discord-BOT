@@ -5,7 +5,7 @@ const randomColor = require('randomcolor');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription('🎵 | Playing Music')
+		.setDescription('🎵 | Started playing music')
         .addStringOption((option) => option
             .setName('track')
             .setDescription('Enter the name/url/playlist you want to play.')
@@ -32,14 +32,13 @@ module.exports = {
 
         const createQueue = await interaction.client.player.createQueue(interaction.guild,{
             metadata: interaction.channel
-        })
+        });
 
         try {
 			if (!createQueue.connection) {
 				await createQueue.connect(interaction.member.voice.channel);
 			}
-		}
-		catch {
+		} catch {
 			createQueue.destroy();
             MusicEmbed
                 .setColor(color)
@@ -65,6 +64,7 @@ module.exports = {
             createQueue.addTracks(song);
 
             MusicEmbed
+                .setColor(color)
                 .setTitle(`**🎶 Playlist added to the queue**`)
                 .setURL(`${playlist.url}`)
                 .setDescription(
@@ -80,6 +80,7 @@ module.exports = {
             createQueue.addTrack(song);
 
             MusicEmbed
+                .setColor(color)
                 .setTitle(`**🎶 Music added to the queue**`)
                 .setURL(`${song.url}`)
                 .setDescription(
