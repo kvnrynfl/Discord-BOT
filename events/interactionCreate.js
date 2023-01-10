@@ -2,6 +2,7 @@ const { Events } = require('discord.js');
 
 module.exports = {
 	name: Events.InteractionCreate,
+	once: false,
 	async execute(interaction) {
 		if (!interaction.isChatInputCommand()) return;
 
@@ -13,11 +14,15 @@ module.exports = {
 		}
 
 		try {
+			await interaction.deferReply();
 			await command.execute(interaction);
 		} catch (error) {
 			console.error(`Error executing ${interaction.commandName}`);
 			console.error(error);
+			await interaction.editReply({
+                content: ":x: | An error occurred",
+                ephemeral: true,
+            });
 		}
-		// console.log(interaction);
 	},
 };

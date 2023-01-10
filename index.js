@@ -7,7 +7,6 @@ const { Player } = require("discord-player");
 // const { handleLogs } = require("./handlers/handleLogs");
 const { loadEvents } = require("./handlers/eventHandler");
 const { loadCommands } = require("./handlers/commandHandler");
-const { playerLogs } = require("./handlers/playerHandler");
 
 // Create a new client instance
 const client = new Client({ 
@@ -57,8 +56,6 @@ client.player = new Player(client, {
 // Log in to Discord with your client's token
 // Loaded All file Handlers
 client.login(token).then(() => {
-	// handleLogs(client);
 	loadEvents(client);
 	loadCommands(client);
-	playerLogs(client.player);
 });
