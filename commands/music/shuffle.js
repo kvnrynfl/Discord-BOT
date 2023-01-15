@@ -25,20 +25,18 @@ module.exports = {
                 .setColor(color)
                 .setDescription(`**❌ | There are no music in the queue**`)
             return interaction.editReply({ embeds : [ShuffleEmbed] });
-        }
-
-        if (countQueue == 1) {
+        } else if (countQueue == 1) {
             ShuffleEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are only 1 music in the queue**`)
             return interaction.editReply({ embeds : [ShuffleEmbed] });
-        }
+        } else {
+            getQueue.shuffle();
 
-        getQueue.shuffle();
-
-        ShuffleEmbed
-            .setColor(color)
-            .setDescription(`**🔀 Successfully shuffle the music queue**`)
-        interaction.editReply({ embeds : [ShuffleEmbed] });
+            ShuffleEmbed
+                .setColor(color)
+                .setDescription(`**🔀 | Successfully shuffle the music queue**`)
+            return interaction.editReply({ embeds : [ShuffleEmbed] });
+        }        
     },
 };
