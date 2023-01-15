@@ -40,9 +40,5 @@ module.exports = {
                 interaction.editReply({embeds : [helpEmbed]});
             }
         });
-
-
-
-        
 	},
 };
