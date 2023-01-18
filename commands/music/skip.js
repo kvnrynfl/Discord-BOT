@@ -6,8 +6,8 @@ module.exports = {
 		.setName('skip')
 		.setDescription('🎵 | Skip the currently playing song')
         .addNumberOption((option) => option
-            .setName("number")
-            .setDescription("Enter the number of queues | if you don't know, you can use /queue")
+            .setName('number')
+            .setDescription(`Enter the number of queues | if you don't know, you can use /queue`)
             .setMinValue(1)
         ),
     async execute(interaction) {
