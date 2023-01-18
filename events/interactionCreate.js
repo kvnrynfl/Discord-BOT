@@ -20,7 +20,7 @@ module.exports = {
 			console.error(`Error executing ${interaction.commandName}`);
 			console.error(error);
 			await interaction.editReply({
-                content: ":x: | An error occurred",
+                content: "❌ | An error occurred, please report it using ``/report bug`` so that it can be fixed immediately",
                 ephemeral: true,
             });
 		}
