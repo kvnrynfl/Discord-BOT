@@ -40,6 +40,7 @@ module.exports = {
 		}
 
         getQueue.destroy();
+        interaction.guild.members.me.voice.disconnect();
         
         LeaveEmbed
             .setColor(color)
