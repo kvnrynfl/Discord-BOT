@@ -1,7 +1,7 @@
 // Require the necessary classes
 const { Client, Collection, GatewayIntentBits, Partials} = require('discord.js');
-const { token } = require('./config.json');
-const { Player } = require("discord-player");
+const { Player } = require('discord-player');
+const config = require('./config.json');
 
 // Require file handlers
 // const { handleLogs } = require("./handlers/handleLogs");
@@ -41,10 +41,8 @@ const client = new Client({
 	disableMentions: 'everyone',
 });
 
-
 // Create a new collection of commands for commandHandler
 client.commands = new Collection();
-
 
 client.player = new Player(client, {
     ytdlOptions: {
@@ -55,7 +53,7 @@ client.player = new Player(client, {
 
 // Log in to Discord with your client's token
 // Loaded All file Handlers
-client.login(token).then(() => {
+client.login(config.client.token).then(() => {
 	loadEvents(client);
 	loadCommands(client);
 });

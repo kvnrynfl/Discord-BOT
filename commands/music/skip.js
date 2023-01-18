@@ -11,7 +11,7 @@ module.exports = {
             .setMinValue(1)
         ),
     async execute(interaction) {
-        const queuenumber = interaction.options.getNumber("number");
+        const skipnumber = interaction.options.getNumber("number");
         var color = randomColor();
         let SkipEmbed = new EmbedBuilder();
 
@@ -34,19 +34,19 @@ module.exports = {
             return interaction.editReply({ embeds : [SkipEmbed] });
         }
 
-        if (queuenumber) {
-            if (queuenumber > countQueue) {
+        if (skipnumber) {
+            if (skipnumber > countQueue) {
                 SkipEmbed
                     .setColor(color)
                     .setDescription(`**❌ | Invalid Number. There are only a total of ${countQueue} queue**`)
                 return interaction.editReply({ embeds : [SkipEmbed] });
             }
 
-            getQueue.skipTo(queuenumber - 1);
+            getQueue.skipTo(skipnumber - 1);
 
             SkipEmbed
                 .setColor(color)
-                .setDescription(`**⏭ | Successfully skip music to track number ${queuenumber}**`)
+                .setDescription(`**⏭ | Successfully skip music to queue number ${skipnumber}**`)
         } else {
             getQueue.skip();
             
