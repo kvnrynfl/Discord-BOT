@@ -1,7 +1,7 @@
 function loadCommands(client) {
 
     const { REST, Routes } = require('discord.js');
-    const { clientId, token } = require('../config.json');
+    const config = require('../config.json');
     const fs = require('node:fs');    
     const ascii = require("ascii-table");
     const table = new ascii().setHeading("Status", "Path", "File", "Commands").setAlignCenter(0);
@@ -28,12 +28,12 @@ function loadCommands(client) {
     }
 
     // Construct and prepare an instance of the REST module
-    const rest = new REST({ version: '10' }).setToken(token);
+    const rest = new REST({ version: '10' }).setToken(config.client.token);
 
     (async () => {
         try {
             const data = await rest.put(
-                Routes.applicationCommands(clientId),
+                Routes.applicationCommands(config.client.clientId),
                 { body: commandsArray },
             );
             table.setTitle(`Reloaded ${data.length}/${commandsArray.length} commands`)
