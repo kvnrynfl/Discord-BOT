@@ -15,7 +15,6 @@ module.exports = {
         var color = randomColor();
         let SkipEmbed = new EmbedBuilder();
 
-
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
         if (!getQueue || !getQueue.playing){
