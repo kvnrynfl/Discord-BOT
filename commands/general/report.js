@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle} = require('discord.js');
+const { SlashCommandBuilder, ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle, EmbedBuilder} = require('discord.js');
+const randomColor = require('randomcolor');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,26 +14,42 @@ module.exports = {
             .setDescription('Report a player who commits a violation')
         ),
 	async execute(interaction) {
+        const subcmd = interaction.options.getSubcommand(["bug", "player"]);
+        var color = randomColor();
+        let ReportEmbed = new EmbedBuilder();
 
-        const reportBug = new ModalBuilder()
-            .setCustomId('reportBug')
-            .setTitle('Report Bug About REY-BOT');
 
-        const TIBreportBug1 = new TextInputBuilder()
-            .setCustomId('whatHappened')
-            .setLabel("What has happened ?")
-            .setStyle(TextInputStyle.Short);
+        switch (subcmd) {
+            case "bug":
+                const TIBreportBug1 = new TextInputBuilder()
+                    .setCustomId('textinput1')
+                    .setLabel("What has happened ?")
+                    .setStyle(TextInputStyle.Short);
 
-        const TIBreportBug2 = new TextInputBuilder()
-            .setCustomId('textinput2')
-            .setLabel("What's some of your favorite hobbies?")
-            .setStyle(TextInputStyle.Paragraph);
+                const TIBreportBug2 = new TextInputBuilder()
+                    .setCustomId('textinput2')
+                    .setLabel("What's some of your favorite hobbies?")
+                    .setStyle(TextInputStyle.Paragraph);
 
-        const firstActionRow = new ActionRowBuilder().addComponents(TIBreportBug1);
-        const secondActionRow = new ActionRowBuilder().addComponents(TIBreportBug2);
+                const firstActionRow = new ActionRowBuilder().addComponents(TIBreportBug1);
+                const secondActionRow = new ActionRowBuilder().addComponents(TIBreportBug2);
 
-        reportBug.addComponents(firstActionRow, secondActionRow);
+                const reportBug = new ModalBuilder()
+                    .setCustomId('reportBug')
+                    .setTitle('Report Bug About REY-BOT')
+                    .addComponents(firstActionRow, secondActionRow);
 
-        await interaction.showModal(reportBug);
+                interaction.showModal(reportBug);
+                break;
+            case "player":
+                
+                break;
+            default:
+                ReportEmbed
+                    .setColor(color)
+                    .setDescription(`**❌ | Unknown sub command.**`)
+                interaction.reply({ embeds : [ReportEmbed] });
+                break;
+        }  
 	},
 };
