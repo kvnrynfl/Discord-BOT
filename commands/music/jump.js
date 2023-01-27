@@ -14,38 +14,74 @@ module.exports = {
     async execute(interaction) {
         const jumpnumber = interaction.options.getNumber("number");
         var color = randomColor();
-        let JumpEmbed = new EmbedBuilder();
+        let NewEmbed = new EmbedBuilder();
 
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
+        if (!jumpnumber) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Option number not detected, please enter the number in the option number**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+
+        if (!interaction.member.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | You must in a voice channel to use this command**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+
+        if (!interaction.guild.members.me.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Bot is not on the voice channel**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+        
+        if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
+			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+		}
+        
         if (!getQueue || !getQueue.playing){
-            JumpEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music being played**`)
-            return interaction.editReply({ embeds : [JumpEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
         const countQueue = getQueue.tracks.length ? getQueue.tracks.length : 0;
 
         if (countQueue < 1) {
-            JumpEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music in the queue**`)
-            return interaction.editReply({ embeds : [JumpEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
         if (countQueue < jumpnumber) {
-            JumpEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | Invalid Number. There are only a total of ${countQueue} queue**`)
-            return interaction.editReply({ embeds : [JumpEmbed] });
-        } else {
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        } 
+ 
+        try {
             getQueue.jump(jumpnumber - 1);
-            
-            JumpEmbed
+        } catch {
+            NewEmbed
                 .setColor(color)
-                .setDescription(`**⏭ | Successfully jump music to queue number ${jumpnumber} **`)
-            return interaction.editReply({ embeds : [JumpEmbed] });
+                .setDescription(`**❌ | Unable to jump another queue**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
+
+        NewEmbed
+            .setColor(color)
+            .setDescription(`**⏭ | Successfully jump music to queue number ${jumpnumber} **`)
+
+        await interaction.reply({ embeds : [NewEmbed] });
     },
 };
