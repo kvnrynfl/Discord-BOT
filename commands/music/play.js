@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType  } = require('discord.js');
 const { QueryType } = require("discord-player");
 const randomColor = require('randomcolor');
 
@@ -25,14 +25,14 @@ module.exports = {
             MusicEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must in a voice channel to use this command**`)
-            return interaction.reply({ embeds : [MusicEmbed], ephemeral: true});
+            return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
         }
 
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
             MusicEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
-			return interaction.reply({ embeds : [MusicEmbed], ephemeral: true});
+			return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
 		}
 
         try {
@@ -44,7 +44,7 @@ module.exports = {
             MusicEmbed
                 .setColor(color)
                 .setDescription(`**❌ | Unable to join your voice channel**`)
-            return interaction.reply({ embeds : [MusicEmbed], ephemeral: true});
+            return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
 		}
 
         const result = await interaction.client.player.search(opPlayTrack, {
@@ -56,13 +56,13 @@ module.exports = {
             MusicEmbed
                 .setColor(color)
                 .setDescription(`**❌ | No Songs/Videos/Playlists found when searching : ${opPlayTrack}**`)
-            return interaction.reply({ embeds : [MusicEmbed], ephemeral: true});
+            return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
         }
 
         if (result.playlist) {
             const song = result.tracks;
             const playlist = result.playlist;
-            createQueue.addTracks(song);
+            await createQueue.addTracks(song);
 
             MusicEmbed
                 .setColor(color)
@@ -82,7 +82,29 @@ module.exports = {
             }
 
             return interaction.reply({ embeds : [MusicEmbed] });
-        } else {
+        } else if (result.tracks.length == 1) {
+            const song = result.tracks[0];
+            await createQueue.addTrack(song);
+
+            MusicEmbed
+                .setColor(color)
+                .setTitle(`**🎶 Music added to the queue**`)
+                .setURL(`${song.url}`)
+                .setDescription(
+                    `**Author** : ${song.author}\n` +
+                    `**Title** : ${song.title}\n` +
+                    `**Duration** : ${song.duration}\n` +
+                    `**Views** : ${song.views}\n` +
+                    `**Request By** : <@${song.requestedBy.id}>\n`
+                )
+                .setThumbnail(song.thumbnail)
+
+            if (!createQueue.playing) {
+                await createQueue.play();
+            }
+
+            return interaction.reply({ embeds : [MusicEmbed] });
+        } else if (result.tracks.length > 1) {
             if (result.tracks.length > 10) {
                 var resultlength = 10;
             } else {
@@ -95,9 +117,9 @@ module.exports = {
             
             const resultoption = result.tracks.slice(0, resultlength).map((song, i) => (
                 {
-                    label: `${i + 1}. ${song.title}`,
-                    description: `Duration : ${song.duration}`,
-                    value: `${i}`,
+                    label: `${i + 1}. ${song.title.substring(0, 95)}`,
+                    description: `Duration : ${song.duration}  ||  Views ${song.views}`,
+                    value: `${i}`
                 }
             ));
 
@@ -107,13 +129,56 @@ module.exports = {
                 .setDescription(`${resultembed}`);
 
             const SSMBplay1 = new StringSelectMenuBuilder()
-                .setCustomId('SelectMenu1')
+                .setCustomId('MusicPlay')
                 .setPlaceholder('Nothing selected')
                 .addOptions(resultoption);
 
             const ARBplay1 = new ActionRowBuilder().addComponents(SSMBplay1);
 
-            return interaction.reply({ embeds : [MusicEmbed], components : [ARBplay1], ephemeral: true });
+            const message = await interaction.reply({ embeds : [MusicEmbed], components : [ARBplay1], ephemeral : true, fetchReply : true });
+
+            const filter = (i) => i.customId === 'MusicPlay' && i.user.id === interaction.user.id;
+
+            const collector = await message.createMessageComponentCollector({ filter, componentType: ComponentType.StringSelect, time: 15000 });
+
+            let CollectorEmbed = new EmbedBuilder();
+            
+            collector.on('collect', async i => {
+                interaction.deleteReply();
+                console.log(`CollectorMusicPlay: <@${i.user.id}> using \`/play\` command, and clicked the \`${i.customId}\` menu button with a value of \`${i.values}\``);
+
+                let value = i.values;
+                let song = result.tracks[value];
+
+                await createQueue.addTrack(song);
+
+                if (!createQueue.playing) {
+                    await createQueue.play();
+                }
+
+                CollectorEmbed
+                    .setColor(color)
+                    .setTitle(`**🎶 Music added to the queue using the menu button**`)
+                    .setURL(`${song.url}`)
+                    .setDescription(
+                        `**Author** : ${song.author}\n` +
+                        `**Title** : ${song.title}\n` +
+                        `**Duration** : ${song.duration}\n` +
+                        `**Views** : ${song.views}\n` +
+                        `**Request By** : <@${song.requestedBy.id}>`
+                    )
+                    .setThumbnail(song.thumbnail)
+                await i.reply({ embeds : [CollectorEmbed] });
+            });
+            collector.on('end', async (collected) => {
+                if (!collected.size){
+                    interaction.deleteReply();
+                    CollectorEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | Timeout, Use the command \`/play\` again**`)
+                    interaction.followUp({ embeds : [CollectorEmbed], ephemeral : true });
+                }
+            });            
         }
     },
 };
