@@ -6,12 +6,12 @@ module.exports = {
 		.setName('skip')
 		.setDescription('🎵 | Skip the currently playing song')
         .addNumberOption((option) => option
-            .setName('number')
+            .setName('amount')
             .setDescription(`Enter the number of queues | if you don't know, you can use /queue`)
             .setMinValue(1)
         ),
     async execute(interaction) {
-        const skipnumber = interaction.options.getNumber("number");
+        const skipnumber = interaction.options.getNumber("amount");
         var color = randomColor();
         let SkipEmbed = new EmbedBuilder();
 
