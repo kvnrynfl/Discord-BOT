@@ -58,7 +58,7 @@ module.exports = {
                         )
                         .setTimestamp()
                         .setFooter({ text: `${user.tag}`, iconURL: `${user.displayAvatarURL()}` });
-                    interaction.editReply({ embeds : [infoBotEmbed] });
+                    interaction.reply({ embeds : [infoBotEmbed] });
                     break;
                 case "server":
                     const owner = await guild.fetchOwner(); 
@@ -95,7 +95,7 @@ module.exports = {
                         )
                         .setTimestamp()
                         .setFooter({ text: `${user.tag}`, iconURL: `${user.displayAvatarURL()}` });
-                    interaction.editReply({ embeds : [infoServerEmbed] });
+                    interaction.reply({ embeds : [infoServerEmbed] });
                     // console.log(guild.PremiumTier.getValue());
                     break;
                 case "user":
@@ -123,7 +123,7 @@ module.exports = {
                         )
                         .setTimestamp()
                         .setFooter({ text: `${user.tag}`, iconURL: `${user.displayAvatarURL({ format: "png", size: 1024 })}` });
-                    interaction.editReply({ embeds : [infoUserEmbed] });
+                    interaction.reply({ embeds : [infoUserEmbed] });
                     // console.log(guild.members.cache.get(`${infoUser.id}`));
                     break;
 
