@@ -1,14 +1,15 @@
 function loadCommands(client) {
-
     const { REST, Routes } = require('discord.js');
     const config = require('../config.json');
     const fs = require('node:fs');    
     const ascii = require("ascii-table");
+
     const table = new ascii().setHeading("Status", "Path", "File", "Commands").setAlignCenter(0);
 
     const commandsArray = [];
     // Grab all the command files from the commands directory you created earlier
     const commandsFolder = fs.readdirSync("./Commands");
+    
     for (const folder of commandsFolder){
         const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
         for (const file of commandFiles) {
@@ -37,10 +38,10 @@ function loadCommands(client) {
                 { body: commandsArray },
             );
             table.setTitle(`Reloaded ${data.length}/${commandsArray.length} commands`)
-            return console.log(table.toString());
+            console.log(table.toString());
         } catch (error) {
             // And of course, make sure you catch and log any errors!
-            return console.error(error);
+            console.error(error);
         }
     })();
 }
