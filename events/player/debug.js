@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'debug',
 	once: false,
-	execute(info) {
+	async execute(info) {
 		console.log(`Debug info: ${info}`);
 	},
 };
