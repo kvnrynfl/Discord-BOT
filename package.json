@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kvnrynfl/REY-BOT.git"
+    "url": "git+https://github.com/kvnrynfl/Discord-Bot.git"
   },
   "author": "Kevin Reynaufal",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/kvnrynfl/REY-BOT/issues"
+    "url": "https://github.com/kvnrynfl/Discord-Bot/issues"
   },
-  "homepage": "https://github.com/kvnrynfl/REY-BOT#readme",
+  "homepage": "https://github.com/kvnrynfl/Discord-Bot#readme",
   "dependencies": {
     "@discord-player/extractor": "^4.0.0",
     "@discordjs/opus": "^0.8.0",
