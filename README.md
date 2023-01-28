@@ -1,4 +1,4 @@
-![https://github.com/kvnrynfl/REY-BOT/](https://repobeats.axiom.co/api/embed/936424f9e7f856b2d9d78ae496eced7af4265816.svg "Repobeats analytics image")
+![https://github.com/kvnrynfl/REY-BOT/](https://repobeats.axiom.co/api/embed/505ebd6cc6d681f9faca63667eb9f51b85c34038.svg "Repobeats analytics image")
 
 # 『 Features 』
 This bot has been in development since 2022 and has accumulated a large number of commands. Here are some command highlights:
