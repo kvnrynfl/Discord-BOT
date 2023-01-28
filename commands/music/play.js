@@ -17,8 +17,7 @@ module.exports = {
         let MusicEmbed = new EmbedBuilder();
 
         const createQueue = await interaction.client.player.createQueue(interaction.guild,{
-            metadata: interaction.channel,
-            spotifyBridge: true,
+            metadata: interaction.channel
         });
 
         if (!interaction.member.voice.channel) {

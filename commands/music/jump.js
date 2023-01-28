@@ -68,9 +68,9 @@ module.exports = {
                 .setDescription(`**❌ | Invalid Number. There are only a total of ${countQueue} queue**`)
             return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         } 
- 
+
         try {
-            getQueue.jump(jumpnumber - 1);
+            await getQueue.jump(jumpnumber - 1);
         } catch {
             NewEmbed
                 .setColor(color)

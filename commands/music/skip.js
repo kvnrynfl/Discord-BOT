@@ -13,47 +13,68 @@ module.exports = {
     async execute(interaction) {
         const skipnumber = interaction.options.getNumber("amount");
         var color = randomColor();
-        let SkipEmbed = new EmbedBuilder();
+        let NewEmbed = new EmbedBuilder();
 
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
+        if (!interaction.member.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | You must in a voice channel to use this command**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+
+		if (!interaction.guild.members.me.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Bot is not on the voice channel**`)
+            return interaction.editReply({ embeds : [NewEmbed], ephemeral : true });
+        }   
+
+        if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
+			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+		}
+        
         if (!getQueue || !getQueue.playing){
-            SkipEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music being played**`)
-            return interaction.editReply({ embeds : [SkipEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
         const countQueue = getQueue.tracks.length ? getQueue.tracks.length : 0;
 
         if (countQueue < 1) {
-            SkipEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music in the queue**`)
-            return interaction.editReply({ embeds : [SkipEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
         if (skipnumber) {
             if (skipnumber > countQueue) {
-                SkipEmbed
+                NewEmbed
                     .setColor(color)
                     .setDescription(`**❌ | Invalid Number. There are only a total of ${countQueue} queue**`)
-                return interaction.editReply({ embeds : [SkipEmbed] });
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
             }
 
             getQueue.skipTo(skipnumber - 1);
 
-            SkipEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**⏭ | Successfully skip music to queue number ${skipnumber}**`)
         } else {
             getQueue.skip();
             
-            SkipEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**⏭ | Successfully to skip music**`)
         }
         
-        interaction.editReply({ embeds : [SkipEmbed] });
+        interaction.reply({ embeds : [NewEmbed] });
     },
 };

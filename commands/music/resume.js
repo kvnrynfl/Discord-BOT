@@ -7,35 +7,43 @@ module.exports = {
 		.setDescription('🎵 | Resume the currently paused song'),
     async execute(interaction) {
         var color = randomColor();
-        let ResumeEmbed = new EmbedBuilder();
+        let NewEmbed = new EmbedBuilder();
         
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
         if (!interaction.member.voice.channel) {
-            ResumeEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must in a voice channel to use this command**`)
-            return interaction.editReply({ embeds : [ResumeEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
+		if (!interaction.guild.members.me.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Bot is not on the voice channel**`)
+            return interaction.editReply({ embeds : [NewEmbed], ephemeral : true });
+        }   
+
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
-            ResumeEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
-			return interaction.editReply({ embeds : [ResumeEmbed] });
+			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
 		}
 
         if (!getQueue || !getQueue.playing){
-            ResumeEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music being played**`)
-            return interaction.editReply({ embeds : [ResumeEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
         getQueue.setPaused(false);
-        ResumeEmbed
+
+        NewEmbed
             .setColor(color)
             .setDescription(`**▶️ | Music successfully resume**`)
-        interaction.editReply({ embeds : [ResumeEmbed] });
+        interaction.editReply({ embeds : [NewEmbed] });
     },
 };

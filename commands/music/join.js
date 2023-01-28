@@ -62,7 +62,7 @@ module.exports = {
                     await createQueue.connect(interaction.member.voice.channel);
                 }
             } catch {
-                createQueue.destroy();
+                await createQueue.destroy();
                 NewEmbed
                     .setColor(color)
                     .setDescription(`**❌ | Unable to join your voice channel**`)

@@ -27,16 +27,44 @@ module.exports = {
     async execute(interaction) {
         const subcmd = interaction.options.getSubcommand(["nowplaying", "find"]);
         var color = randomColor();
-        let LyricsEmbed = new EmbedBuilder();
+        let NewEmbed = new EmbedBuilder();
 
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
         switch(subcmd){
             case "nowplaying":
+                if (!interaction.member.voice.channel) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | You must in a voice channel to use this command**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                }
+        
+                if (!interaction.guild.members.me.voice.channel) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | Bot is not on the voice channel**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                }
+                
+                if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                }
+
+                if (!getQueue || !getQueue.playing){
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | There are no music being played**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                }
+
                 songTitle = getQueue.current.title;
                 filterTitle = getQueue.current.title.indexOf("(");
 
-                if (filterTitle !== -1) {
+                if (filterTitle !== -1 && filterTitle > 5) {
                     songTitle = songTitle.slice(0, filterTitle);
                 }
 
@@ -47,20 +75,20 @@ module.exports = {
                     console.log(`Lyrics : ${error}`);
                 }
 
-                LyricsEmbed
+                NewEmbed
                     .setColor(color)
                     .setTitle(`Lyrics for ${songTitle}`)
                     .setDescription(lyrics)
                     .setThumbnail(`${getQueue.current.thumbnail}`)
 
-                if (LyricsEmbed.toJSON().description.length >= 4096) {
-                    LyricsEmbed.setDescription(`${LyricsEmbed.toJSON().description.substring(
+                if (NewEmbed.toJSON().description.length >= 4096) {
+                    NewEmbed.setDescription(`${NewEmbed.toJSON().description.substring(
                         0,
                         4095,
                     )}...`)
                 }
 
-                interaction.editReply({ embeds : [LyricsEmbed] });
+                interaction.reply({ embeds : [NewEmbed] });
                 break;
 
             case "find":
@@ -74,19 +102,19 @@ module.exports = {
                     console.log(`Lyrics : ${error}`);
                 }
 
-                LyricsEmbed
+                NewEmbed
                     .setColor(color)
                     .setTitle(`Lyrics for ${songTitle} | ${songAuthor}`)
                     .setDescription(lyrics)
 
-                if (LyricsEmbed.toJSON().description.length >= 4096) {
-                    LyricsEmbed.setDescription(`${LyricsEmbed.toJSON().description.substring(
+                if (NewEmbed.toJSON().description.length >= 4096) {
+                    NewEmbed.setDescription(`${NewEmbed.toJSON().description.substring(
                         0,
                         4095,
                     )}...`)
                 }
 
-                interaction.editReply({ embeds : [LyricsEmbed]});
+                interaction.reply({ embeds : [NewEmbed]});
                 break;
         }
     },

@@ -7,33 +7,52 @@ module.exports = {
 		.setDescription('🎵 | Displays the music being played'),
     async execute(interaction) {
         var color = randomColor();
-        let QueueEmbed = new EmbedBuilder();
+        let NewEmbed = new EmbedBuilder();
 
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
-        if (!getQueue || !getQueue.playing){
-            QueueEmbed
+        if (!interaction.member.voice.channel) {
+            NewEmbed
                 .setColor(color)
-                .setDescription(`**❌ | There are no music being played**`)
-            return interaction.editReply({ embeds : [QueueEmbed] });
+                .setDescription(`**❌ | You must in a voice channel to use this command**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
-        const nowPlaying = getQueue.current;
+        if (!interaction.guild.members.me.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Bot is not on the voice channel**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+        
+        if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
+			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+		}
+        
+        if (!getQueue || !getQueue.playing){
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | There are no music being played**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
 
-        QueueEmbed
+        NewEmbed
             .setColor(color)
             .setTitle(`**🎶 Music being played**`)
             .setDescription(
-                `Author : ${nowPlaying.author}\n` +
-                `Title : [${nowPlaying.title}](${nowPlaying.url})\n` +
-                `Duration : ${nowPlaying.duration}\n` +
-                `Views : ${nowPlaying.views}\n` +
-                `Request By : <@${nowPlaying.requestedBy.id}>`
+                `Author : ${getQueue.current.author}\n` +
+                `Title : [${getQueue.current.title}](${getQueue.current.url})\n` +
+                `Duration : ${getQueue.current.duration}\n` +
+                `Views : ${getQueue.current.views}\n` +
+                `Request By : <@${getQueue.current.requestedBy.id}>`
             )
-            .setThumbnail(nowPlaying.thumbnail)
+            .setThumbnail(getQueue.current.thumbnail)
             .addFields(
                 { name: "Progress Bar", value: `${getQueue.createProgressBar({ timecodes: true , queue : true,})}` }
             )
-        interaction.editReply({ embeds : [QueueEmbed] });
+        interaction.reply({ embeds : [NewEmbed] });
     },
 };

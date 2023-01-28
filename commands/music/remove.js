@@ -15,55 +15,59 @@ module.exports = {
     async execute(interaction) {
         const removenumber = interaction.option.getNumber('number');
         var color = randomColor();
-        let RemoveEmbed = new EmbedBuilder();
+        let NewEmbed = new EmbedBuilder();
         
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
         if (!interaction.member.voice.channel) {
-            RemoveEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must in a voice channel to use this command**`)
-            return interaction.editReply({ embeds : [RemoveEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
+        if (!interaction.guild.members.me.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Bot is not on the voice channel**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+        
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
-            RemoveEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
-			return interaction.editReply({ embeds : [RemoveEmbed] });
+			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
 		}
-
+        
         if (!getQueue || !getQueue.playing){
-            RemoveEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music being played**`)
-            return interaction.editReply({ embeds : [RemoveEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
         const countQueue = getQueue.tracks.length ? getQueue.tracks.length : 0;
 
         if (countQueue < 1) {
-            RemoveEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music in the queue**`)
-            return interaction.editReply({ embeds : [RemoveEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
-        if (removenumber) {
-            if (removenumber > countQueue) {
-                RemoveEmbed
-                    .setColor(color)
-                    .setDescription(`**❌ | Invalid Number. There are only a total of ${countQueue} queue**`)
-                return interaction.editReply({ embeds : [RemoveEmbed] });
-            }
-
-            getQueue.remove(removenumber - 1);
-
-            RemoveEmbed
+        if (removenumber > countQueue) {
+            NewEmbed
                 .setColor(color)
-                .setDescription(`**⏭ | Successfully skip music to queue number ${removenumber}**`)
+                .setDescription(`**❌ | Invalid Number. There are only a total of ${countQueue} queue**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
-        interaction.editReply({ embeds : [RemoveEmbed] });
+        getQueue.remove(removenumber - 1);
+
+        NewEmbed
+            .setColor(color)
+            .setDescription(`**⏭ | Successfully skip music to queue number ${removenumber}**`)
+        interaction.reply({ embeds : [NewEmbed] });
     },
 };
