@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { botversion, botwebsite } = require('../../config.json');
+const config = require('../../config.json');
 const moment = require('moment');
 
 module.exports = {
@@ -26,6 +26,7 @@ module.exports = {
         const botuser = interaction.client.user;
         const guild = interaction.guild;
         const user = interaction.user;
+        const guildMembers = await guild.members.fetch({ withPresences: true });
         const subcmd = interaction.options.getSubcommand(["bot", "server", "user"]);
 		const target = interaction.options.getUser('target');
 
@@ -50,8 +51,8 @@ module.exports = {
                         .setThumbnail(`${botuser.displayAvatarURL()}`)
                         .addFields(
                             { name: 'Bot Name', value: `${botuser.username }` },
-                            { name: 'Version', value: `${botversion}` },
-                            { name: 'Website', value: `[${botwebsite}](https://${botwebsite})` },
+                            { name: 'Version', value: `${config.client.botversion}` },
+                            { name: 'Website', value: `[${config.client.botwebsite}](https://${config.client.botwebsite})` },
                             { name: 'Created At', value: `${moment(botuser.createdAt).format("DD/MM/YYYY")}` },
                             { name: 'Uptime', value: `${updays} days ${uphours} hours ${upminutes} minutes ${upseconds} seconds` },
                             { name: 'Developer', value: `Kvnrynfl_#3572\n[kevinreynaufal.my.id](https://kevinreynaufal.my.id)` },
@@ -62,69 +63,80 @@ module.exports = {
                     break;
                 case "server":
                     const owner = await guild.fetchOwner(); 
-                    let guildMembers = await guild.members.fetch({ withPresences: true })
-                    const onlineMembers = await guildMembers.filter(member => member.presence?.status != "offline").size;
-                    // const offlineMembers = interaction.guild.members.cache.filter(member => member.presence?.status == "offline").size;
-                    // const awayMembers = message.guild.members.cache.filter(member => member.presence?.status == "idle").size;
-                    // const dndMembers = message.guild.members.cache.filter(member => member.presence?.status == "dnd").size;
-                    // const m_bot = guild.members.cache.filter(member => member.user.bot).size;
-                    // const m_human = guild.members.cache.filter(member => !member.user.bot).size;
-                    const channel = guild.channels.cache.size;
-                    const c_text = guild.channels.cache.filter(c => c.type === 0).size;
-                    // const c_dm = guild.channels.cache.filter(c => c.type === 1).size;
-                    const c_voice = guild.channels.cache.filter(c => c.type === 2).size;
-                    // const c_gdm = guild.channels.cache.filter(c => c.type === 3).size;
-                    const c_category = guild.channels.cache.filter(c => c.type === 4).size;
-                    const c_announcement = guild.channels.cache.filter(c => c.type === 5).size;
+                    
+                    let GuildMemberHumanSize = await guildMembers.filter(member => !member.user.bot).size;
+                    let GuildMemberBotSize = await guildMembers.filter(member => member.user.bot).size;
+
+                    let GuildMemberOnlineSize = await guildMembers.filter(member => member.presence?.status == 'online', 'idle', 'dnd').size;
+                    let GuildMemberOfflineSize = await guildMembers.filter(member => member.presence?.status !== `online`, `idle`, `dnd`).size;
+
+                    let GuildChannelSize = guild.channels.cache.size;
+                    let GuildChannelTextSize = guild.channels.cache.filter(c => c.type === 0).size;
+                    // let GuildChannelDMSize = guild.channels.cache.filter(c => c.type === 1).size;
+                    let GuildChannelVoiceSize = guild.channels.cache.filter(c => c.type === 2).size;
+                    // let GuildChannelGroupDMSize = guild.channels.cache.filter(c => c.type === 3).size;
+                    let GuildChannelCategorySize = guild.channels.cache.filter(c => c.type === 4).size;
+                    let GuildChannelAnnouncementSize = guild.channels.cache.filter(c => c.type === 5).size;
+                    let GuildChannelAnnouncementThreadSize = guild.channels.cache.filter(c => c.type === 10).size;
+                    let GuildChannelPublicThreadSize = guild.channels.cache.filter(c => c.type === 11).size;
+                    let GuildChannelPrivateThreadSize = guild.channels.cache.filter(c => c.type === 12).size;
+                    let GuildChannelVoiceStageSize = guild.channels.cache.filter(c => c.type === 13).size;
+                    let GuildChannelDirectorySize = guild.channels.cache.filter(c => c.type === 14).size;
+                    let GuildChannelForumSize = guild.channels.cache.filter(c => c.type === 15).size;
+
+                    let GuildRolesSort = guild.roles.cache.sort((a, b) => b.rawPosition - a.rawPosition);
+                    let GuildRolesFilterMember = GuildRolesSort.filter(role => !role.tags.botId);
+                    let GuildRolesFilterBot = GuildRolesSort.filter(role => role.tags.botId);
+                    let GuildRolesMap = GuildRolesSort.map(role => `${role.name}`).slice(0, 30).join(', ');
+
                     const infoServerEmbed = new EmbedBuilder()
                         .setColor(color)
                         .setThumbnail(`${guild.iconURL()}`)
                         .addFields(
-                            { name: 'Name', value: `${guild.name}` },
-                            { name: 'ID', value: `${guild.id}` },
-                            { name: 'Owner', value: `${owner.user.tag}` },
-                            { name: 'Region', value: `${guild.preferredLocale}` },
-                            { name: 'Verification Level', value: `${guild.verificationLevel}` },
-                            { name: 'Rules', value: `<#${guild.rulesChannelId}>`, inline: true },
-                            { name: 'AFK', value: `<#${guild.afkChannelId}>`, inline: true },
-                            { name: 'Roles', value: `${guild.roles.cache.map(role => `<@&${role.id}>`).join(',')}` },
-                            { name: 'Boost', value: `Level 0\nBoosts 0`, inline: true },
-                            { name: 'Channel', value: `Total ${channel}\nCategory ${c_category}\nText ${c_text}\nVoice ${c_voice}\n Announcement ${c_announcement}`, inline: true },
-                            { name: 'Members', value: `Total ${guild.memberCount}\nOnline ${onlineMembers}\nBots 0\nHumans 0`, inline: true },
-                            { name: 'Created At', value: `${moment(guild.createdAt).format("DD MMMM YYYY - LT")}`},
+                            { name: 'Server Name', value: `\`\`\`${guild.name}\`\`\``, inline: true },
+                            { name: 'Server ID', value: `\`\`\`${guild.id}\`\`\``, inline: true },
+                            { name: `Server Member`, value: `\`\`\`Total Member : ${guild.memberCount}\nHumans : ${GuildMemberHumanSize} | Bots : ${GuildMemberBotSize}\nOnline : ${GuildMemberOnlineSize} | Offline : ${GuildMemberOfflineSize}\`\`\`` },
+                            { name: 'Owner Name', value: `\`\`\`${owner.user.tag}\`\`\``, inline: true },
+                            { name: 'Owner ID', value: `\`\`\`${owner.user.id}\`\`\``, inline: true },
+                            { name: 'Server Channels', value: `\`\`\`Total Channels : ${GuildChannelSize}\nCategory : ${GuildChannelCategorySize} | Text : ${GuildChannelTextSize} | Voice : ${GuildChannelVoiceSize}\`\`\`\`\`\`Announcement : ${GuildChannelAnnouncementSize} | Announcement Thread : ${GuildChannelAnnouncementThreadSize}\nPrivate Thread : ${GuildChannelPrivateThreadSize} | Public Thread : ${GuildChannelPublicThreadSize}\nVoice Stage : ${GuildChannelVoiceStageSize} | Directory : ${GuildChannelDirectorySize} | Forum : ${GuildChannelForumSize}\`\`\`` },
+                            { name: 'Server Region', value: `\`\`\`${guild.preferredLocale}\`\`\``, inline: true },
+                            { name: 'Server Verification', value: `\`\`\`Level : ${guild.verificationLevel}\`\`\``, inline: true },
+                            // { name: 'Rules Channel', value: `<#${guild.rulesChannelId}>`, inline: true },
+                            // { name: 'AFK Channel', value: `<#${guild.afkChannelId}>`, inline: true },
+                            { name: `Server Roles (Shows up to 30 roles)`, value: `\`\`\`Total Roles : ${guild.roles.cache.size}\nRoles Human : ${GuildRolesFilterMember.size} | Roles Bot : ${GuildRolesFilterBot.size}\`\`\`\`\`\`${GuildRolesMap}\`\`\`` },
+                            { name: 'Boost Level', value: `\`\`\`${guild.premiumTier}\`\`\``, inline: true },
+                            { name: 'Boost Amount', value: `\`\`\`${guild.premiumSubscriptionCount}\`\`\``, inline: true },
+                            { name: 'Created At', value: `\`\`\`${moment(guild.createdAt).format("DD MMMM YYYY - LT")}\`\`\`` },
                         )
-                        .setTimestamp()
-                        .setFooter({ text: `${user.tag}`, iconURL: `${user.displayAvatarURL()}` });
                     interaction.reply({ embeds : [infoServerEmbed] });
-                    // console.log(guild.PremiumTier.getValue());
+                    console.log(guild.roles.cache);
                     break;
                 case "user":
-                    if(target) {
-                        infoUser = target;
-                    } else {
-                        infoUser = interaction.user;
-                    }
-                    const nickname = (guild.members.cache.get(`${infoUser.id}`).nickname) ? `${guild.members.cache.get(`${infoUser.id}`).nickname}` : `${infoUser.username}`;
-                    const humanorbot = (infoUser.bot ? "BOT" : "Human");
-                    const infoUserEmbed = new EmbedBuilder()
+                    const UserTarget = (target ?? interaction.user);
+                    
+                    const GuildUserCache = guildMembers.get(`${UserTarget.id}`);
+                    const GuildUserPresenceStatus = (GuildUserCache.presence?.status ?? 'offline').charAt(0).toUpperCase() + (GuildUserCache.presence?.status ?? 'offline').slice(1);
+
+                    const nickname = (guild.members.cache.get(`${UserTarget.id}`).nickname) ? `${guild.members.cache.get(`${UserTarget.id}`).nickname}` : `${UserTarget.username}`;
+                    const humanorbot = (UserTarget.bot ? "BOT" : "Human");
+                    const UserTargetEmbed = new EmbedBuilder()
                         .setColor(color)
-                        .setThumbnail(`${infoUser.displayAvatarURL({ format: "png", size: 1024 })}`)
+                        .setThumbnail(`${UserTarget.displayAvatarURL({ format: "png", size: 1024 })}`)
                         .addFields(
-                            { name: 'Mention', value: `<@${infoUser.id}>`},
-                            { name: 'Name', value: `${infoUser.username}`, inline: true},
-                            { name: 'Discriminator', value: `#${infoUser.discriminator}`, inline: true},
-                            { name: 'Nickname', value: `${nickname}`},
-                            { name: 'User ID', value: `${infoUser.id}` },
-                            { name: 'Status', value: `${humanorbot}, ${infoUser.presence?.status ? infoUser.presence?.status : "Offline"}`},
-                            { name: 'Boost', value: `${infoUser.premium_type}` },
-                            { name: 'Roles', value: `${guild.members.cache.get(`${infoUser.id}`).roles.cache.map(role => `<@&${role.id}>`).join(', ')}` },
-                            { name: 'Joined At', value: `${moment(infoUser.joinedAt).format("DD MMMM YYYY")}`},
-                            { name: 'Created At', value: `${moment(infoUser.createdAt).format("DD MMMM YYYY")}`},
+                            { name: 'Mention', value: `<@${UserTarget.id}>` },
+                            { name: 'Name', value: `${UserTarget.username}`, inline: true },
+                            { name: 'Discriminator', value: `#${UserTarget.discriminator}`, inline: true },
+                            { name: 'Nickname', value: `${nickname}` },
+                            { name: 'User ID', value: `${UserTarget.id}` },
+                            { name: 'Status', value: `${humanorbot}, ${GuildUserPresenceStatus}` },
+                            { name: 'Boost', value: `${UserTarget.premium_type}` },
+                            { name: 'Roles', value: `${guild.members.cache.get(`${UserTarget.id}`).roles.cache.map(role => `<@&${role.id}>`).join(', ')}` },
+                            { name: 'Joined At', value: `\`\`\`${moment(UserTarget.joinedAt).format("DD MMMM YYYY - LT")}\`\`\`` },
+                            { name: 'Created At', value: `\`\`\`${moment(UserTarget.createdAt).format("DD MMMM YYYY - LT")}\`\`\`` },
                         )
                         .setTimestamp()
                         .setFooter({ text: `${user.tag}`, iconURL: `${user.displayAvatarURL({ format: "png", size: 1024 })}` });
-                    interaction.reply({ embeds : [infoUserEmbed] });
-                    // console.log(guild.members.cache.get(`${infoUser.id}`));
+                    interaction.reply({ embeds : [UserTargetEmbed] });
                     break;
 
             }
