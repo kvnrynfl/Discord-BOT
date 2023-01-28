@@ -1,16 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const randomColor = require('randomcolor');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription('🤖 | See your ping!'),
 	async execute(interaction) {
-
-		// Mengubah warna pesan embed menjadi warna random yang cerah
-		const r = Math.floor(Math.random() * 200) + 50;
-		const g = Math.floor(Math.random() * 200) + 50;
-		const b = Math.floor(Math.random() * 200) + 50;
-		const color = `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+		let color = randomColor();
+		let NewEmbed = new EmbedBuilder();
 
 	 	// Informasi mengenai uptime discord bot
         let totaluptime = (interaction.client.uptime / 1000);
@@ -19,11 +16,12 @@ module.exports = {
 		let upminutes = Math.floor( (totaluptime%= 3600) / 60);
 		let upseconds = Math.floor(totaluptime % 60);
 
-		const msg = await interaction.editReply({content: "⏳ | Calculating ping...", fetchReply:true });
-		ping = msg.createdTimestamp - interaction.createdTimestamp;
-		disapi = Math.round(interaction.client.ws.ping);
+		const msg = await interaction.reply({content: "⏳ | Calculating ping...", fetchReply : true });
 
-		const pingEmbed = new EmbedBuilder()
+		let ping = msg.createdTimestamp - interaction.createdTimestamp;
+		let disapi = Math.round(interaction.client.ws.ping);
+
+		NewEmbed
             .setColor(color)
             .addFields(
                 { name: "Ping", value: `\` ${ping} ms \``, inline: true },
@@ -32,7 +30,8 @@ module.exports = {
                 { name: "Problem ?", value: "Check discord status : [discordstatus.com](https://discordstatus.com/)" },
             )
 			.setTimestamp()
-			.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.displayAvatarURL()}` });
-        await interaction.editReply({ content: false, embeds: [pingEmbed] });
+			.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.displayAvatarURL()}` })
+
+        await interaction.editReply({ content: false, embeds: [NewEmbed] });
 	},
 };

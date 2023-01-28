@@ -16,7 +16,7 @@ module.exports = {
 	async execute(interaction) {
         const subcmd = interaction.options.getSubcommand(["bug", "player"]);
         var color = randomColor();
-        let ReportEmbed = new EmbedBuilder();
+        let NewEmbed = new EmbedBuilder();
 
 
         switch (subcmd) {
@@ -45,10 +45,10 @@ module.exports = {
                 
                 break;
             default:
-                ReportEmbed
+                NewEmbed
                     .setColor(color)
                     .setDescription(`**❌ | Unknown sub command.**`)
-                interaction.reply({ embeds : [ReportEmbed] });
+                interaction.reply({ embeds : [NewEmbed] });
                 break;
         }  
 	},
