@@ -4,14 +4,14 @@ const randomColor = require('randomcolor');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('report')
-		.setDescription('Report bugs, players and more')
+		.setDescription('🤖 | Report bugs, players and more')
         .addSubcommand((subcommand) => subcommand
             .setName('bug')
-            .setDescription('Report bugs about bots')
+            .setDescription('🤖 | Report bugs about bots')
         )
         .addSubcommand((subcommand) => subcommand
             .setName('player')
-            .setDescription('Report a player who commits a violation')
+            .setDescription('🤖 | Report a player who commits a violation')
         ),
 	async execute(interaction) {
         const subcmd = interaction.options.getSubcommand(["bug", "player"]);
