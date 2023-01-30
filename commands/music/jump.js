@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -7,10 +7,12 @@ module.exports = {
 		.setDescription('🎵 | Jump to another queue')
         .addNumberOption((option) => option
             .setName("number")
-            .setDescription("Enter the number of queues | if you don't know, you can use /queue")
+            .setDescription("🎵 | Enter the number of queues | if you don't know, you can use /queue")
             .setMinValue(1)
             .setRequired(true)
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
+        .setDMPermission(false),
     async execute(interaction) {
         const jumpnumber = interaction.options.getNumber("number");
         var color = randomColor();

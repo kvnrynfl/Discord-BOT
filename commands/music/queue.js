@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -7,9 +7,11 @@ module.exports = {
 		.setDescription('🎵 | Displays the music queue')
         .addNumberOption((option) => option
             .setName('page')
-            .setDescription('Enter the queue page number')
+            .setDescription('🎵 | Enter the queue page number')
             .setMinValue(1)
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
+        .setDMPermission(false),
     async execute(interaction) {
         const opQueuePage = (interaction.options.getNumber('page') || 1) - 1;
         var color = randomColor();

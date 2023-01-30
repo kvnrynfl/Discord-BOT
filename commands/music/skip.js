@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -7,9 +7,11 @@ module.exports = {
 		.setDescription('🎵 | Skip the currently playing song')
         .addNumberOption((option) => option
             .setName('amount')
-            .setDescription(`Enter the number of queues | if you don't know, you can use /queue`)
+            .setDescription(`🎵 | Enter the number of queues | if you don't know, you can use /queue`)
             .setMinValue(1)
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
+        .setDMPermission(false),
     async execute(interaction) {
         const skipnumber = interaction.options.getNumber("amount");
         var color = randomColor();

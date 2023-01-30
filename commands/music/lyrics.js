@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const randomColor = require('randomcolor');
 const lyricsFinder = require("lyrics-finder");
 
@@ -8,22 +8,24 @@ module.exports = {
 		.setDescription('🎵 | Display music lyrics')
         .addSubcommand((subcommand) => subcommand
             .setName('nowplaying')
-            .setDescription('Display lyrics of the music being played')
+            .setDescription('🎵 | Display lyrics of the music being played')
         )
         .addSubcommand((subcommand) => subcommand
             .setName('find')
-            .setDescription('Display more specific music lyrics')
+            .setDescription('🎵 | Display more specific music lyrics')
             .addStringOption((option) => option
                 .setName('title')
-                .setDescription('Enter the title of the music for which you want the lyrics to appear.')
+                .setDescription('🎵 | Enter the title of the music for which you want the lyrics to appear.')
                 .setRequired(true)
             )
             .addStringOption((option) => option
                 .setName('author')
-                .setDescription('Enter the author of the music for which you want the lyrics to appear.')
+                .setDescription('🎵 | Enter the author of the music for which you want the lyrics to appear.')
                 .setRequired(true)
             )
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
+        .setDMPermission(false),
     async execute(interaction) {
         const subcmd = interaction.options.getSubcommand(["nowplaying", "find"]);
         var color = randomColor();
@@ -114,7 +116,7 @@ module.exports = {
                     )}...`)
                 }
 
-                interaction.reply({ embeds : [NewEmbed]});
+                interaction.reply({ embeds : [NewEmbed] });
                 break;
         }
     },

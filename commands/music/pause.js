@@ -1,10 +1,12 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { randomColor } = require('randomcolor');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const randomColor = require('randomcolor');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('pause')
-		.setDescription('🎵 | Pause the music being played'),
+		.setDescription('🎵 | Pause the music being played')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
+        .setDMPermission(false),
     async execute(interaction) {
         var color = randomColor();
         let NewEmbed = new EmbedBuilder();

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ChannelType } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ChannelType } = require('discord.js');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -7,9 +7,11 @@ module.exports = {
 		.setDescription('🎵 | Join voice channel')
         .addChannelOption(option => option
             .setName('channel')
-            .setDescription('Tag voice channel')
+            .setDescription('🎵 | Tag voice channel')
             .addChannelTypes(ChannelType.GuildVoice)
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
+        .setDMPermission(false),
     async execute(interaction) {
         const opJoinChannel = interaction.options.getChannel('channel');
         var color = randomColor();
