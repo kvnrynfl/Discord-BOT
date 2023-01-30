@@ -2,3 +2,5 @@
 deploy-commands.js
 destroy-commands.js
 config.json
+DevHelp.txt
+.env
