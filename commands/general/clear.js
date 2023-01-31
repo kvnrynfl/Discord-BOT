@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -10,7 +10,9 @@ module.exports = {
 			.setMinValue(1)
 			.setMaxValue(99)
 			.setRequired(true)
-		),
+		)
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+        .setDMPermission(false),
 	async execute(interaction) {
 		const amount = interaction.options.getInteger('amount');
 

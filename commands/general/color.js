@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -38,8 +38,9 @@ module.exports = {
         .addSubcommand(subcommand => subcommand 
 			.setName('random')
 			.setDescription('🤖 | Displays a random color and displays a hex color code')
-		),
-        
+		)
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+        .setDMPermission(false),
 	async execute(interaction) {
         const subcmd = interaction.options.getSubcommand(["find", "random"]);
         const optColorFindColor = interaction.options.getString('color');

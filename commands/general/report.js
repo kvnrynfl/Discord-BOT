@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle, EmbedBuilder} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle, EmbedBuilder} = require('discord.js');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -12,7 +12,9 @@ module.exports = {
         .addSubcommand((subcommand) => subcommand
             .setName('player')
             .setDescription('🤖 | Report a player who commits a violation')
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+        .setDMPermission(false),
 	async execute(interaction) {
         const subcmd = interaction.options.getSubcommand(["bug", "player"]);
         var color = randomColor();

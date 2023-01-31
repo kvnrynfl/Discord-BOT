@@ -1,10 +1,12 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const randomColor = require('randomcolor');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription('🤖 | See your ping!'),
+		.setDescription('🤖 | See your ping!')
+		.setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+        .setDMPermission(false),
 	async execute(interaction) {
 		let color = randomColor();
 		let NewEmbed = new EmbedBuilder();
@@ -32,6 +34,6 @@ module.exports = {
 			.setTimestamp()
 			.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.displayAvatarURL()}` })
 
-        await interaction.editReply({ content: false, embeds: [NewEmbed] });
+        await interaction.editReply({ embeds: [NewEmbed] });
 	},
 };
