@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType  } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType  } = require('discord.js');
 const { QueryType } = require("discord-player");
 const randomColor = require('randomcolor');
 
@@ -8,9 +8,34 @@ module.exports = {
 		.setDescription('🎵 | Started playing music')
         .addStringOption((option) => option
             .setName('track')
-            .setDescription('Enter the Name/URL/PlayList you want to play')
+            .setDescription('🎵 | Enter the Title/URL/PlayList you want to play')
             .setRequired(true)
-        ),
+            .setAutocomplete(true)
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
+        .setDMPermission(false),
+    async autocomplete(interaction) {
+        const focusedValue = interaction.options.getFocused();
+
+        const result = await interaction.client.player.search(focusedValue, {
+            requestedBy: interaction.user,
+            searchEngine: QueryType.AUTO,
+        });
+        
+        if (!result || !result.tracks.length) return;
+
+        const resultFilter = result.tracks.filter(res => 
+			res.title.toLowerCase().includes(focusedValue.toLowerCase())
+		).sort((a, b) => 
+			b.views - a.views
+		);
+
+        await interaction.respond(
+			resultFilter.slice(0, 10).map(res => (
+				{ name: `[ ${res.duration} ] ${res.title.slice(0, 85)}`, value: res.url }
+			)),
+		);
+    },
     async execute(interaction) {
         const opPlayTrack = interaction.options.getString('track');
         let color = randomColor();
@@ -50,7 +75,7 @@ module.exports = {
             requestedBy: interaction.user,
             searchEngine: QueryType.AUTO,
         });
-
+        console.log(result);
         if (!result || !result.tracks.length) {
             MusicEmbed
                 .setColor(color)
