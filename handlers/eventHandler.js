@@ -1,8 +1,8 @@
-function loadEvents(client) {
-    const ascii = require('ascii-table');
-    const fs = require('node:fs');
+const AsciiTable = require('ascii-table');
+const fs = require('node:fs');
 
-    const table = new ascii().setHeading('Status', 'Path', 'File').setAlignCenter(0);
+function loadEvents(client) {
+    const table = new AsciiTable().setHeading('Status', 'Path', 'File').setAlignCenter(0);
 
     const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
@@ -34,7 +34,22 @@ function loadEvents(client) {
         continue;
     }
 
+    const eventDatabaseFiles = fs.readdirSync('./events/database').filter(file => file.endsWith('.js'));
+
+    for (const file of eventDatabaseFiles) {
+        const event = require(`../events/database/${file}`);
+
+        if (event.once){
+            client.database.once(event.name, (...args) => event.execute(...args, client));
+        } else {
+            client.database.on(event.name, (...args) => event.execute(...args, client));
+        }
+
+        table.addRow("✔", './database/', file)
+        continue;
+    }
+
     return console.log(table.toString());
 }
 
-module.exports = {loadEvents};
+module.exports = { loadEvents };
