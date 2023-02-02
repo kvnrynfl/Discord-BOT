@@ -1,44 +1,66 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const { table, getBorderCharacters } = require("table");
+const randomColor = require('randomcolor');
+require('dotenv').config()
+const config = require('../../config.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('help')
-		.setDescription('Replies with help embed!'),
+		.setDescription('🤖 | Replies with help embed!')
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+        .setDMPermission(false),
 	async execute(interaction) {
-        const helpEmbed = new EmbedBuilder()
-            .setColor(0x33CCFF)
-            .setTitle('INFORMATION ')
-            .setURL('https://discord.js.org/')
-            .setAuthor({ name: `${interaction.client.user.tag}`, iconURL: `${interaction.client.user.displayAvatarURL()}`, url: 'https://rey-bot.kevinreynaufal.my.id' })
-            .setDescription('Some description here')
-            .setThumbnail('https://i.imgur.com/AfFp7pu.png')
+        var color = randomColor();
+        let NewEmbed = new EmbedBuilder();
+
+        tableConfig = {
+            ...config.table.text,
+            drawHorizontalLine: () => false
+        }
+
+        function listHelpCommands() {
+            let commandsInfo = interaction.guild.commands.client.commands.filter(dir => dir.data.name === 'info');
+            let commandsReport = interaction.guild.commands.client.commands.filter(dir => dir.data.name === 'report');
+            let dataArray = [];
+
+            commandsInfo.forEach((cmd) => {
+                cmd.data.options.forEach((grp) => {
+                    if (grp.options && grp.options.length) {
+                        grp.options.forEach((sub) => {
+                            dataArray.push(`> \`/${cmd.data.name} ${grp.name} [${sub.name}]\` = ${grp.description.slice(5)}`);
+                        });
+                    } else {
+                        dataArray.push(`> \`/${cmd.data.name} ${grp.name}\` = ${grp.description.slice(5)}`);
+                    }
+                });
+            });
+            commandsReport.forEach((cmd) => {
+                cmd.data.options.filter(grp => grp.name !== 'player').forEach((grp) => {
+                    if(grp.option && grp.option.length) {
+                        grp.options.forEach((sub) => {
+                            dataArray.push(`> \`/${cmd.data.name} ${grp.name} [${sub.name}]\` = ${grp.description.slice(5)}`);
+                        });
+                    } else {
+                        dataArray.push(`> \`/${cmd.data.name} ${grp.name}\` = ${grp.description.slice(5)}`);
+                    }
+                })
+            });
+            return dataArray;
+        }
+
+        NewEmbed
+            .setColor(color)
             .addFields(
-                { name: 'Regular field title', value: 'Some value here' },
-                { name: '\u200B', value: '\u200B' },
-                { name: 'Inline field title', value: 'Some value here', inline: true },
-                { name: 'Inline field title', value: 'Some value here', inline: true },
+                { name: 'Helpful links', value: 
+                    `> [Invite](https://${process.env.CLIENT_INVITE})\n` +
+                    `> [Website](https://${process.env.CLIENT_WEBSITE})\n` +
+                    `> [Contribution](https://${process.env.CLIENT_REPOSITORY})\n` +
+                    `> [Support Server](https://${process.env.CLIENT_SUPPORT})\n` 
+                },
+                { name: 'Other Information', value: listHelpCommands().join('\n') },
             )
-            .addFields({ name: 'Inline field title', value: 'Some value here', inline: true })
-            .setImage('https://i.imgur.com/AfFp7pu.png')
-            .setTimestamp()
-            .setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
-		return interaction.editreply({ embeds : [helpEmbed] }).then(async msg => {
-            // Loop selama 10 detik
-            for (let i = 0; i < 10; i++) {
-                // Menunggu 1 detik
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                // Mengubah warna pesan embed menjadi warna random yang cerah
-                const r = Math.floor(Math.random() * 200) + 50; // Warna merah acak antara 50 dan 250
-                const g = Math.floor(Math.random() * 200) + 50; // Warna hijau acak antara 50 dan 250
-                const b = Math.floor(Math.random() * 200) + 50; // Warna biru acak antara 50 dan 250
-                const color = `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
-                helpEmbed.setColor(color);
-
-                // Mengirim pesan embed yang sudah diubah warnya ke channel text
-                interaction.editReply({embeds : [helpEmbed]});
-            }
-        });
+            // .setFooter(`REY-BOT v${process.env.CLIENT_VERSION}`);
+		interaction.reply({ embeds : [NewEmbed] });
 	},
 };
