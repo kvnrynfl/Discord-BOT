@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType } = require('discord.js');
 const config = require('../../config.json');
 const randomColor = require('randomcolor');
 const moment = require('moment');
@@ -12,6 +12,10 @@ module.exports = {
             .setDescription('🤖 | Info tentang bot')
         )
         .addSubcommand(subcommand => subcommand
+            .setName('commands')
+            .setDescription('🤖 | Informasi commands yang tersedia pada bot')
+        )
+        .addSubcommand(subcommand => subcommand
             .setName('server')
             .setDescription('🤖 | Info tentang server')
         )
@@ -22,9 +26,11 @@ module.exports = {
                 .setName('target')
                 .setDescription('🤖 | Tag pengguna yang ingin Anda tampilkan')
             )
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+        .setDMPermission(false),
 	async execute(interaction) {
-        const subcmd = interaction.options.getSubcommand(["bot", "server", "user"]);
+        const subcmd = interaction.options.getSubcommand(["bot", "commands", "server", "user"]);
 		const target = interaction.options.getUser('target');
         let color = randomColor();
         let NewEmbed = new EmbedBuilder();
@@ -52,6 +58,226 @@ module.exports = {
                         { name: `[Developer](https://kevinreynaufal.my.id)`, value: `\`\`\`Kvnrynfl_#3572\nhttps://kevinreynaufal.my.id\`\`\`` },
                     )
                 interaction.reply({ embeds : [NewEmbed] });
+                break;
+            case "commands":
+                function infoCommands(dirname) {
+                    let commands = interaction.guild.commands.client.commands.filter(dir => dir.folder === dirname && dir.folder !== 'owner');
+                    let dataArray = [];
+                
+                    commands.forEach((cmd) => {
+                        if (cmd.data.options && cmd.data.options.length){
+                            cmd.data.options.forEach((grp) => {
+                                if (grp.options && grp.options.length) {
+                                    grp.options.forEach((sub) => {
+                                        if (sub.options && sub.options.length) {
+                                            sub.options.forEach((opt) => {
+                                                if (opt.type) {
+                                                    dataArray.push(`\`/${cmd.data.name} ${grp.name} ${sub.name} ${opt.name}\``);
+                                                }
+                                            });
+                                        } else if (!sub.type){
+                                            dataArray.push(`\`/${cmd.data.name} ${grp.name} ${sub.name}\``);
+                                        }
+                                    });
+                                } else if (!grp.type){
+                                    dataArray.push(`\`/${cmd.data.name} ${grp.name}\``);
+                                }
+                            });
+                        } else if (!cmd.type) {
+                            dataArray.push(`\`/${cmd.data.name}\``);
+                        } 
+                    });
+                    return dataArray;
+                }
+
+                function optGeneralInfo(dirname) {
+                    let dirCommands = interaction.guild.commands.client.commands.filter(dir => dir.folder !== 'owner');
+                    let values = Array.from(dirCommands.values());
+                    let commands = [
+                        {
+                            label: 'Main Menu',
+                            value: 'default',
+                            default: (dirname ? false : true)
+                        },
+                    ];
+
+                    values.forEach((value) => {
+                        if (!commands.some(folder => folder.value === `dir_${value.folder}`)) {
+                            commands.push({
+                                label: `${value.folder.charAt(0).toUpperCase()}${value.folder.slice(1)} [${dirCommands.filter(dir => dir.folder === value.folder).size}]`,
+                                description: dirCommands.filter(dir => dir.folder === value.folder).map((cmd) => cmd.data.name).join(', ').substring(0, 80),
+                                value: `dir_${value.folder}`,
+                                default: (value.folder === dirname ? true : false)
+                            });
+                        }
+                    });
+                    return commands;
+                }
+
+                function optListCommands(dirname, cmdname) {
+                    let dirCommands = interaction.guild.commands.client.commands.filter(dir => dir.folder === dirname);
+                    let commands = [
+                        {
+                            label: 'Main Menu',
+                            value: 'default',
+                            default: (cmdname ? false : true)
+                        },
+                    ];
+
+                    dirCommands.forEach((cmd) => {
+                        commands.push({
+                            label: `/${cmd.data.name}`,
+                            description: cmd.data.description,
+                            value: `cmd_${cmd.folder}_${cmd.data.name}`,
+                            default: (cmd.data.name === cmdname ? true : false)
+                        });
+                    });
+                    return commands;
+                }
+
+                function listCommands(dirname) {
+                    let dirCommands = interaction.guild.commands.client.commands.filter(dir => dir.folder === dirname);
+                    let commands = [];
+
+                    dirCommands.forEach((cmd) => {
+                        commands.push(`\`/${cmd.data.name}\` = ${cmd.data.description.slice(5)}`);
+                    });
+                    return commands;
+                }
+
+                function detailCommands(cmdname) {
+                    let commands = interaction.guild.commands.client.commands.filter(dir => dir.data.name === cmdname);
+                    let dataArray = [];
+                
+                    commands.forEach((cmd) => {
+                        if(!dataArray.some(data => data === `> Permission: ${cmd.data.default_member_permissions ?? ''}\n> DM Permission: ${cmd.data.dm_permission ?? ''}\n> Command = \`/${cmd.data.name}\`\n> Description = ${cmd.data.description.slice(5)}`)) {
+                            dataArray.push(`> Permission: ${cmd.data.default_member_permissions ?? ''}\n> DM Permission: ${cmd.data.dm_permission ?? ''}\n> Command = \`/${cmd.data.name}\`\n> Description = ${cmd.data.description.slice(5)}`);
+                        }
+                        if (cmd.data.options && cmd.data.options.length){
+                            cmd.data.options.forEach((grp) => {
+                                if (grp.type) {
+                                    if(!dataArray.some(data => data === `\n> Command = \`/${cmd.data.name}\`\n> Description = ${cmd.data.description.slice(5)}`)){
+                                        dataArray.push(`\n> Command = \`/${cmd.data.name}\`\n> Description = ${cmd.data.description.slice(5)}`)
+                                    }
+                                    dataArray.push(`\n> Option Name: [${grp.name}]\n> Option Type: ${grp.type}\n> Option Required: ${grp.required}\n> Option Description: ${grp.description.slice(5)}`);
+                                } else if (grp.options && grp.options.length) {
+                                    grp.options.forEach((sub) => {
+                                        if (sub.type) {
+                                            if(!dataArray.some(data => data === `\n> Command = \`/${cmd.data.name} ${grp.name}\`\n> Description = ${grp.description.slice(5)}`)){
+                                                dataArray.push(`\n> Command = \`/${cmd.data.name} ${grp.name}\`\n> Description = ${grp.description.slice(5)}`)
+                                            }
+                                            dataArray.push(`\n> Option Name: [${sub.name}]\n> Option Type: ${sub.type}\n> Option Required: ${sub.required}\n> Option Description: ${sub.description.slice(5)}`);
+                                        } else if (sub.options && sub.options.length) {
+                                            sub.options.forEach((opt) => {
+                                                if (opt.type) {
+                                                    if(!dataArray.some(data => data === `\n> Command = \`/${cmd.data.name} ${grp.name} ${sub.name}\`\n> Description = ${sub.description.slice(5)}`)){
+                                                        dataArray.push(`\n> Command = \`/${cmd.data.name} ${grp.name} ${sub.name}\`\n> Description = ${sub.description.slice(5)}`)
+                                                    }
+                                                    dataArray.push(`\n> Option Name: [${opt.name}]\n> Option Type: ${opt.type}\n> Option Required: ${opt.required}\n> Option Description: ${opt.description.slice(5)}`);
+                                                } else {
+                                                    dataArray.push(`\n> Command = \`/${cmd.data.name} ${grp.name} ${sub.name} ${opt.name}\`\n> Description = ${opt.description.slice(5)}`);
+                                                }
+                                            });
+                                        } else {
+                                            dataArray.push(`\n> Command = \`/${cmd.data.name} ${grp.name} ${sub.name}\`\n> Description = ${sub.description.slice(5)}`);
+                                        }
+                                    });
+                                } else {
+                                    dataArray.push(`\n> Command = \`/${cmd.data.name} ${grp.name}\`\n> Description = ${grp.description.slice(5)}`);
+                                }
+                            });
+                        } else {
+                            dataArray.push(`\n> Command = \`/${cmd.data.name}\`\n> Description = ${cmd.data.description.slice(5)}`)
+                        }
+                    });
+                    return dataArray;
+                }
+                
+                NewEmbed
+                    .setColor(color)
+                    .addFields(
+                        // { name: 'Admin', value: `${infoCommands('admin')}` },
+                        { name: 'General', value: `${infoCommands('general').join(', ')}` },
+                        { name: 'Music', value: `${infoCommands('music').join(', ')}` },
+                    )
+                    .setFooter({ text: 'You can check the details of permissions, options, and description using the selection feature below.' })
+
+                const ARBinfoCommands1 = new ActionRowBuilder().addComponents(
+                    new StringSelectMenuBuilder()
+                        .setCustomId('GeneralInfo')
+                        .setPlaceholder('Nothing selected')
+                        .addOptions(optGeneralInfo()),
+                );
+
+                const message = await interaction.reply({ embeds : [NewEmbed], components : [ARBinfoCommands1], fetchReply : true });
+
+                const filter = i => {
+                    i.deferUpdate();
+                    return i.user.id === interaction.user.id;
+                };
+
+                const collector = await message.createMessageComponentCollector({ filter, componentType: ComponentType.StringSelect, time: 150000 });
+
+                let CollectorEmbed = new EmbedBuilder();
+
+                collector.on('collect', async i => {
+                    // i.reply(`User : <@${i.user.id}>\nClicked : ${i.customId}\nValue : ${i.values}`);
+                    console.log(`CollectorGeneralInfo: <@${i.user.id}> using \`/Info Commands\` command, and clicked the \`${i.customId}\` menu button with a value of \`${i.values}\``);
+                    var collectorValue = i.values.toString().split("_");
+
+                    var type = collectorValue[0];
+                    var dirname = collectorValue[1];
+                    var cmdname = collectorValue[2];
+                    if (type === 'default') {
+                        interaction.editReply({ embeds : [NewEmbed], components : [ARBinfoCommands1] });
+                    } else if (type === 'dir') {
+                        let ARBinfoCommands2 = new ActionRowBuilder().addComponents(
+                            new StringSelectMenuBuilder()
+                                .setCustomId('GeneralInfo')
+                                .setPlaceholder('Nothing selected')
+                                .addOptions(optGeneralInfo(`${dirname}`)),
+                        );
+                        let ARBinfoCommands3 = new ActionRowBuilder().addComponents(
+                            new StringSelectMenuBuilder()
+                                .setCustomId('GeneralInfoCommands')
+                                .setPlaceholder('Nothing selected')
+                                .addOptions(optListCommands(`${dirname}`)),
+                        );
+                        CollectorEmbed
+                            .setColor(randomColor())
+                            .setTitle(`**${dirname.charAt(0).toUpperCase() + dirname.slice(1)} Commands [${interaction.guild.commands.client.commands.filter(dir => dir.folder === `${dirname}`).size}]**`)
+                            .setDescription(`${listCommands(`${dirname}`).join('\n')}`)
+                        await interaction.editReply({ embeds : [CollectorEmbed], components : [ARBinfoCommands2, ARBinfoCommands3] });
+                    } else if (type === 'cmd') {
+                        let ARBinfoCommands2 = new ActionRowBuilder().addComponents(
+                            new StringSelectMenuBuilder()
+                                .setCustomId('GeneralInfo')
+                                .setPlaceholder('Nothing selected')
+                                .addOptions(optGeneralInfo(`${dirname}`)),
+                        );
+                        let ARBinfoCommands3 = new ActionRowBuilder().addComponents(
+                            new StringSelectMenuBuilder()
+                                .setCustomId('GeneralInfoCommands')
+                                .setPlaceholder('Nothing selected')
+                                .addOptions(optListCommands(`${dirname}`, `${cmdname}`)),
+                        );
+                        CollectorEmbed
+                            .setColor(randomColor())
+                            .setTitle(`**Command /${cmdname}**`)
+                            .setDescription(`${detailCommands(`${cmdname}`).join('\n')}`)
+                        await interaction.editReply({ embeds : [CollectorEmbed], components : [ARBinfoCommands2, ARBinfoCommands3] });
+                    }
+                });
+                collector.on('end', async (collected) => {
+                    if (!collected.size){
+                        interaction.deleteReply();
+                        CollectorEmbed
+                            .setColor(color)
+                            .setDescription(`**❌ | Timeout, Use the command \`/info commands\` again**`)
+                        interaction.followUp({ embeds : [CollectorEmbed], ephemeral : true });
+                    }
+                    interaction.editReply({ components: [] });
+                }); 
                 break;
             case "server":
                 const owner = await interaction.guild.fetchOwner(); 
