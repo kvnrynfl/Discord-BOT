@@ -9,10 +9,6 @@ module.exports = {
             .setName('bug')
             .setDescription('🤖 | Report bugs about bots')
         )
-        .addSubcommand((subcommand) => subcommand
-            .setName('player')
-            .setDescription('🤖 | Report a player who commits a violation')
-        )
         .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
         .setDMPermission(false),
 	async execute(interaction) {
@@ -23,28 +19,26 @@ module.exports = {
 
         switch (subcmd) {
             case "bug":
-                const TIBreportBug1 = new TextInputBuilder()
-                    .setCustomId('textinput1')
-                    .setLabel("What has happened ?")
-                    .setStyle(TextInputStyle.Short);
-
-                const TIBreportBug2 = new TextInputBuilder()
-                    .setCustomId('textinput2')
-                    .setLabel("What's some of your favorite hobbies?")
-                    .setStyle(TextInputStyle.Paragraph);
-
-                const firstActionRow = new ActionRowBuilder().addComponents(TIBreportBug1);
-                const secondActionRow = new ActionRowBuilder().addComponents(TIBreportBug2);
-
+                const ARBReportBug1 = new ActionRowBuilder().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId('InputGeneralReportBug1')
+                        .setLabel("Full Name")
+                        .setStyle(TextInputStyle.Short)
+                        .setPlaceholder('Please input your full name.')
+                );
+                const ARBReportBug2 = new ActionRowBuilder().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId('InputGeneralReportBug2')
+                        .setLabel("What Happened")
+                        .setStyle(TextInputStyle.Paragraph)
+                        .setPlaceholder("Please explain about the bug that occurred.")
+                        .setValue("Title : \nScreenshot URL : \nDescription : ")
+                );
                 const reportBug = new ModalBuilder()
-                    .setCustomId('reportBug')
-                    .setTitle('Report Bug About REY-BOT')
-                    .addComponents(firstActionRow, secondActionRow);
-
+                    .setCustomId('GeneralReportBug')
+                    .setTitle('Bug Report Submission Form')
+                    .addComponents(ARBReportBug1, ARBReportBug2);
                 interaction.showModal(reportBug);
-                break;
-            case "player":
-                
                 break;
             default:
                 NewEmbed
