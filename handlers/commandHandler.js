@@ -1,14 +1,15 @@
-function loadCommands(client) {
+require('dotenv').config()
+const { REST, Routes } = require('discord.js');
+const fs = require('node:fs');    
+const AsciiTable = require("ascii-table");
 
-    const { REST, Routes } = require('discord.js');
-    const { clientId, token } = require('../config.json');
-    const fs = require('node:fs');    
-    const ascii = require("ascii-table");
-    const table = new ascii().setHeading("Status", "Path", "File", "Commands").setAlignCenter(0);
+function loadCommands(client) {
+    const table = new AsciiTable().setHeading("Status", "Path", "File", "Commands").setAlignCenter(0).setAlignCenter(1);
 
     const commandsArray = [];
     // Grab all the command files from the commands directory you created earlier
     const commandsFolder = fs.readdirSync("./Commands");
+    
     for (const folder of commandsFolder){
         const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
         for (const file of commandFiles) {
@@ -28,19 +29,19 @@ function loadCommands(client) {
     }
 
     // Construct and prepare an instance of the REST module
-    const rest = new REST({ version: '10' }).setToken(token);
+    const rest = new REST({ version: '10' }).setToken(process.env.CLIENT_TOKEN);
 
     (async () => {
         try {
             const data = await rest.put(
-                Routes.applicationCommands(clientId),
+                Routes.applicationCommands(process.env.CLIENT_ID),
                 { body: commandsArray },
             );
-            table.setTitle(`Reloaded ${data.length}/${commandsArray.length} commands`)
-            return console.log(table.toString());
+            table.setTitle(`Reloaded ${data.length}/${commandsArray.length} commands`);
+            console.log(table.toString());
         } catch (error) {
             // And of course, make sure you catch and log any errors!
-            return console.error(error);
+            console.error(error);
         }
     })();
 }

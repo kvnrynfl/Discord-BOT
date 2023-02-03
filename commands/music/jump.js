@@ -3,15 +3,29 @@ const randomColor = require('randomcolor');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('shuffle')
-		.setDescription('🎵 | Shuffle the music queue')
+		.setName('jump')
+		.setDescription('🎵 | Jump to another queue')
+        .addNumberOption((option) => option
+            .setName("number")
+            .setDescription("🎵 | Enter the number of queues | if you don't know, you can use /queue")
+            .setMinValue(1)
+            .setRequired(true)
+        )
         .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
         .setDMPermission(false),
     async execute(interaction) {
+        const jumpnumber = interaction.options.getNumber("number");
         var color = randomColor();
         let NewEmbed = new EmbedBuilder();
 
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
+
+        if (!jumpnumber) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Option number not detected, please enter the number in the option number**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
 
         if (!interaction.member.voice.channel) {
             NewEmbed
@@ -20,20 +34,20 @@ module.exports = {
             return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
-		if (!interaction.guild.members.me.voice.channel) {
+        if (!interaction.guild.members.me.voice.channel) {
             NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | Bot is not on the voice channel**`)
-            return interaction.editReply({ embeds : [NewEmbed], ephemeral : true });
-        }   
-
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+        
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
             NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
 			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
 		}
-
+        
         if (!getQueue || !getQueue.playing){
             NewEmbed
                 .setColor(color)
@@ -48,18 +62,28 @@ module.exports = {
                 .setColor(color)
                 .setDescription(`**❌ | There are no music in the queue**`)
             return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
-        } else if (countQueue == 1) {
-            NewEmbed
-                .setColor(color)
-                .setDescription(`**❌ | There are only 1 music in the queue**`)
-            return interaction.editReply({ embeds : [NewEmbed], ephemeral : true });
-        } else {
-            getQueue.shuffle();
+        }
 
+        if (countQueue < jumpnumber) {
             NewEmbed
                 .setColor(color)
-                .setDescription(`**🔀 | Successfully shuffle the music queue**`)
-            return interaction.editReply({ embeds : [NewEmbed] });
-        }        
+                .setDescription(`**❌ | Invalid Number. There are only a total of ${countQueue} queue**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        } 
+
+        try {
+            await getQueue.jump(jumpnumber - 1);
+        } catch {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Unable to jump another queue**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+
+        NewEmbed
+            .setColor(color)
+            .setDescription(`**⏭ | Successfully jump music to queue number ${jumpnumber} **`)
+
+        await interaction.reply({ embeds : [NewEmbed] });
     },
 };

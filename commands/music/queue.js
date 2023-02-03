@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -7,42 +7,65 @@ module.exports = {
 		.setDescription('🎵 | Displays the music queue')
         .addNumberOption((option) => option
             .setName('page')
-            .setDescription('Enter the queue page number')
+            .setDescription('🎵 | Enter the queue page number')
             .setMinValue(1)
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
+        .setDMPermission(false),
     async execute(interaction) {
         const opQueuePage = (interaction.options.getNumber('page') || 1) - 1;
         var color = randomColor();
-        let QueueEmbed = new EmbedBuilder();
+        let NewEmbed = new EmbedBuilder();
 
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
+        if (!interaction.member.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | You must in a voice channel to use this command**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+
+        if (!interaction.guild.members.me.voice.channel) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | Bot is not on the voice channel**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+        
+        if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
+			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+		}
+        
         if (!getQueue || !getQueue.playing){
-            QueueEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music being played**`)
-            return interaction.editReply({ embeds : [QueueEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
         const countQueue = getQueue.tracks.length ? getQueue.tracks.length : 0;
 
         if (countQueue < 1) {
-            QueueEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music in the queue**`)
-            return interaction.editReply({ embeds : [QueueEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
         const totalPages = Math.ceil(countQueue / 10) || 1;
 
         if (opQueuePage + 1 > totalPages) {
-            QueueEmbed
+            NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | Invalid Page. There are only a total of ${totalPages} pages of queue**`)
-            return interaction.editReply({ embeds : [QueueEmbed] });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
-        QueueEmbed
+        NewEmbed
             .setColor(color)
             .setTitle(`**🎶 List of music queue to be played**`)
             .setDescription(
@@ -54,6 +77,6 @@ module.exports = {
                 text: `Page ${opQueuePage + 1} of ${totalPages}`,
                 iconURL: `${interaction.client.user.displayAvatarURL()}`
             })
-        interaction.editReply({ embeds : [QueueEmbed] });
+        interaction.reply({ embeds : [NewEmbed] });
     },
 };

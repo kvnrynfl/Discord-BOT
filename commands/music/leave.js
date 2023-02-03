@@ -3,8 +3,8 @@ const randomColor = require('randomcolor');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('nowplaying')
-		.setDescription('🎵 | Displays the music being played')
+		.setName('leave')
+		.setDescription('🎵 | Leave voice channel')
         .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
         .setDMPermission(false),
     async execute(interaction) {
@@ -33,28 +33,16 @@ module.exports = {
                 .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
 			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
 		}
-        
-        if (!getQueue || !getQueue.playing){
-            NewEmbed
-                .setColor(color)
-                .setDescription(`**❌ | There are no music being played**`)
-            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+
+        try {
+            await getQueue.destroy();
+        } catch {
+            interaction.guild.members.me.voice.disconnect();
         }
 
         NewEmbed
             .setColor(color)
-            .setTitle(`**🎶 Music being played**`)
-            .setDescription(
-                `Author : ${getQueue.current.author}\n` +
-                `Title : [${getQueue.current.title}](${getQueue.current.url})\n` +
-                `Duration : ${getQueue.current.duration}\n` +
-                `Views : ${getQueue.current.views}\n` +
-                `Request By : <@${getQueue.current.requestedBy.id}>`
-            )
-            .setThumbnail(getQueue.current.thumbnail)
-            .addFields(
-                { name: "Progress Bar", value: `${getQueue.createProgressBar({ timecodes: true , queue : true,})}` }
-            )
-        interaction.reply({ embeds : [NewEmbed] });
+            .setDescription(`**⏭ | Successfully to leave voice channel**`)
+        await interaction.reply({ embeds : [NewEmbed] });
     },
 };

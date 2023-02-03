@@ -1,26 +1,20 @@
+const AsciiTable = require('ascii-table');
+const fs = require('node:fs');
+
 function loadEvents(client) {
-    const ascii = require('ascii-table');
-    const fs = require('node:fs');
-    const table = new ascii().setHeading('Status', 'Path', 'File').setAlignCenter(0);
+    const table = new AsciiTable().setHeading('Status', 'Path', 'File').setAlignCenter(0);
 
     const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
     for (const file of eventFiles) {
         const event = require(`../events/${file}`);
-        
-        if (event.rest) {
-            if (event.once) {
-                client.once(event.name, (...args) => event.execute(...args));
-            } else {
-                client.on(event.name, (...args) => event.execute(...args));
-            }
+
+        if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args, client));
         } else {
-            if (event.once){
-                client.once(event.name, (...args) => event.execute(...args));
-            } else {
-                client.on(event.name, (...args) => event.execute(...args));
-            }
+            client.on(event.name, (...args) => event.execute(...args, client));
         }
+
         table.addRow("✔", './', file);
         continue;
     }
@@ -30,23 +24,32 @@ function loadEvents(client) {
     for (const file of eventPlayerFiles) {
         const event = require(`../events/player/${file}`);
 
-        if (event.rest) {
-            if (event.once) {
-                client.player.once(event.name, (...args) => event.execute(...args));
-            } else {
-                client.player.on(event.name, (...args) => event.execute(...args));
-            }
+        if (event.once){
+            client.player.once(event.name, (...args) => event.execute(...args, client));
         } else {
-            if (event.once){
-                client.player.once(event.name, (...args) => event.execute(...args));
-            } else {
-                client.player.on(event.name, (...args) => event.execute(...args));
-            }
+            client.player.on(event.name, (...args) => event.execute(...args, client));
         }
+
         table.addRow("✔", './player/', file)
+        continue;
+    }
+
+    const eventDatabaseFiles = fs.readdirSync('./events/database').filter(file => file.endsWith('.js'));
+
+    for (const file of eventDatabaseFiles) {
+        const event = require(`../events/database/${file}`);
+
+        if (event.once){
+            client.database.once(event.name, (...args) => event.execute(...args, client));
+        } else {
+            client.database.on(event.name, (...args) => event.execute(...args, client));
+        }
+
+        table.addRow("✔", './database/', file)
+        continue;
     }
 
     return console.log(table.toString());
 }
 
-module.exports = {loadEvents};
+module.exports = { loadEvents };

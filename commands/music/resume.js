@@ -3,14 +3,14 @@ const randomColor = require('randomcolor');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('shuffle')
-		.setDescription('🎵 | Shuffle the music queue')
+		.setName('resume')
+		.setDescription('🎵 | Resume the currently paused song')
         .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
         .setDMPermission(false),
     async execute(interaction) {
         var color = randomColor();
         let NewEmbed = new EmbedBuilder();
-
+        
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
 
         if (!interaction.member.voice.channel) {
@@ -41,25 +41,11 @@ module.exports = {
             return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
-        const countQueue = getQueue.tracks.length ? getQueue.tracks.length : 0;
+        getQueue.setPaused(false);
 
-        if (countQueue < 1) {
-            NewEmbed
-                .setColor(color)
-                .setDescription(`**❌ | There are no music in the queue**`)
-            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
-        } else if (countQueue == 1) {
-            NewEmbed
-                .setColor(color)
-                .setDescription(`**❌ | There are only 1 music in the queue**`)
-            return interaction.editReply({ embeds : [NewEmbed], ephemeral : true });
-        } else {
-            getQueue.shuffle();
-
-            NewEmbed
-                .setColor(color)
-                .setDescription(`**🔀 | Successfully shuffle the music queue**`)
-            return interaction.editReply({ embeds : [NewEmbed] });
-        }        
+        NewEmbed
+            .setColor(color)
+            .setDescription(`**▶️ | Music successfully resume**`)
+        interaction.editReply({ embeds : [NewEmbed] });
     },
 };
