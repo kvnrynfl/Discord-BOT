@@ -1,7 +1,9 @@
 module.exports = {
 	name: 'debug',
 	once: false,
-	async execute(info) {
-		console.log(`Debug info: ${info}`);
+	async execute(queue, message) {
+		// console.log(`🎵 | Debug : ${message}`);
+		// console.log(queue);
+		// console.log(message);
 	},
 };
