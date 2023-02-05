@@ -12,7 +12,6 @@ module.exports = {
         let NewEmbed = new EmbedBuilder();
 
         const getQueue = interaction.client.player.getQueue(interaction.guildId);
-
         if (!interaction.member.voice.channel) {
             NewEmbed
                 .setColor(color)
@@ -26,14 +25,14 @@ module.exports = {
                 .setDescription(`**❌ | Bot is not on the voice channel**`)
             return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
-        
+
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
             NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
 			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
 		}
-        
+
         if (!getQueue || !getQueue.playing){
             NewEmbed
                 .setColor(color)
@@ -53,7 +52,15 @@ module.exports = {
             )
             .setThumbnail(getQueue.current.thumbnail)
             .addFields(
-                { name: "Progress Bar", value: `${getQueue.createProgressBar({ timecodes: true , queue : true,})}` }
+                { name: "Progress Bar", value: `${getQueue.createProgressBar({ timecodes: true , queue : true,})}` },
+                { name: "Music Option", value: 
+                    `Paused : ${getQueue.connection.paused}\n` +
+                    `LeaveOnEnd : ${getQueue.options.leaveOnEnd}\n` +
+                    `LeaveOnStop : ${getQueue.options.leaveOnStop}\n` +
+                    `LeaveOnEmpty : ${getQueue.options.leaveOnEmpty}\n` +
+                    `LeaveOnEndCooldown : ${getQueue.options.leaveOnEndCooldown}\n` +
+                    `LeaveOnEmptyCooldown : ${getQueue.options.leaveOnEmptyCooldown}`
+                }
             )
         interaction.reply({ embeds : [NewEmbed] });
     },
