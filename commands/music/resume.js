@@ -24,7 +24,7 @@ module.exports = {
             NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | Bot is not on the voice channel**`)
-            return interaction.editReply({ embeds : [NewEmbed], ephemeral : true });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }   
 
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
@@ -53,6 +53,6 @@ module.exports = {
         NewEmbed
             .setColor(color)
             .setDescription(`**▶️ | Music successfully resume**`)
-        interaction.editReply({ embeds : [NewEmbed] });
+        interaction.reply({ embeds : [NewEmbed] });
     },
 };
