@@ -34,10 +34,17 @@ module.exports = {
 			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
 		}
         
-        if (!getQueue || !getQueue.playing){
+        if (!getQueue){
             NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music being played**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+
+        if (getQueue.connection.paused) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | The queue is already paused**`)
             return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
