@@ -75,7 +75,7 @@ module.exports = {
             requestedBy: interaction.user,
             searchEngine: QueryType.AUTO,
         });
-        console.log(result);
+
         if (!result || !result.tracks.length) {
             MusicEmbed
                 .setColor(color)
@@ -169,7 +169,7 @@ module.exports = {
             
             collector.on('collect', async i => {
                 interaction.deleteReply();
-                console.log(`CollectorMusicPlay: <@${i.user.id}> using \`/play\` command, and clicked the \`${i.customId}\` menu button with a value of \`${i.values}\``);
+                console.log(`Collector | MusicPlay: <@${i.user.id}> using \`/play\` command, and clicked the \`${i.customId}\` menu button with a value of \`${i.values}\``);
 
                 let value = i.values;
                 let song = result.tracks[value];

@@ -24,7 +24,7 @@ module.exports = {
             NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | Bot is not on the voice channel**`)
-            return interaction.editReply({ embeds : [NewEmbed], ephemeral : true });
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }   
 
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
@@ -34,10 +34,17 @@ module.exports = {
 			return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
 		}
 
-        if (!getQueue || !getQueue.playing){
+        if (!getQueue){
             NewEmbed
                 .setColor(color)
                 .setDescription(`**❌ | There are no music being played**`)
+            return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+        }
+
+        if (!getQueue.connection.paused) {
+            NewEmbed
+                .setColor(color)
+                .setDescription(`**❌ | The queue is not currently paused**`)
             return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
         }
 
@@ -46,6 +53,6 @@ module.exports = {
         NewEmbed
             .setColor(color)
             .setDescription(`**▶️ | Music successfully resume**`)
-        interaction.editReply({ embeds : [NewEmbed] });
+        interaction.reply({ embeds : [NewEmbed] });
     },
 };

@@ -1,7 +1,8 @@
 module.exports = {
 	name: 'channelEmpty',
 	once: false,
-	async execute() {
-		console.log('Player Log : Nobody is in the voice channel, leaving the voice channel... ❌');
+	async execute(queue) {
+		console.log("EventPlayer | ChannelEmpty : Nobody is in the voice channel, leaving the voice channel... ❌");
+		// console.log(queue);
 	},
 };
