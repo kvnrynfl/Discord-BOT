@@ -5,7 +5,7 @@ const randomColor = require('randomcolor');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('queue')
-		.setDescription('🎵 | Displays the music queue')
+		.setDescription('🎵 | Option for music queue')
         .addSubcommand(subcommand => subcommand
             .setName('view')
             .setDescription('🎵 | Menampilkan music status')
@@ -44,13 +44,14 @@ module.exports = {
                 .setRequired(true)
             )
         )
+        .addSubcommand(subcommand => subcommand
+            .setName('clear')
+            .setDescription('🎵 | Clear the music queue')
+        )
         .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
         .setDMPermission(false),
     async execute(interaction) {
         const subcmd = interaction.options.getSubcommand(["view", "shuffle", "loop", "remove"]);
-        const opViewPage = (interaction.options.getNumber('page') || 1) - 1;
-        const opLoopMode = interaction.options.getInteger('mode');
-        const opRemoveNumber = interaction.option.getNumber('number');
         var color = randomColor();
         let NewEmbed = new EmbedBuilder();
 
@@ -88,6 +89,7 @@ module.exports = {
 
         switch (subcmd) {
             case 'view':
+                const opViewPage = (interaction.options.getNumber('page') || 1) - 1;
                 if (countQueue < 1) {
                     NewEmbed
                         .setColor(color)
@@ -132,7 +134,7 @@ module.exports = {
                     return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
                 }
 
-                getQueue.shuffle();
+                await getQueue.shuffle();
 
                 NewEmbed
                     .setColor(color)
@@ -141,6 +143,7 @@ module.exports = {
                 break;
 
             case 'loop':
+                const opLoopMode = interaction.options.getInteger('mode');
                 function StringLoop(repeatMode) {
                     let StringLoop;
                     switch (repeatMode) {
@@ -183,10 +186,11 @@ module.exports = {
                 break;
 
             case 'remove':
+                const opRemoveNumber = interaction.option.getNumber('number');
                 if (countQueue < 1) {
                     NewEmbed
                         .setColor(color)
-                        .setDescription(`**❌ | There are no music in the queue, use command \`/nowplaying\` to see the music currently playing**`)
+                        .setDescription(`**❌ | There are no music in the queue, use command \`/stop\` to stop the music playing**`)
                     return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
                 } else if (opRemoveNumber > countQueue) {
                     NewEmbed
@@ -195,11 +199,27 @@ module.exports = {
                     return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
                 }
 
-                getQueue.remove(opRemoveNumber - 1);
+                await getQueue.remove(opRemoveNumber - 1);
 
                 NewEmbed
                     .setColor(color)
                     .setDescription(`**⏭ | Successfully skip music to queue number ${opRemoveNumber}**`)
+                interaction.reply({ embeds : [NewEmbed] });
+                break;
+
+            case 'clear':
+                if (countQueue < 1) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | There are no music in the queue, use command \`/stop\` to stop the music playing**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                }
+
+                await getQueue.clear();
+
+                NewEmbed
+                    .setColor(color)
+                    .setDescription(`✅ | Successfully removed all music queue`)
                 interaction.reply({ embeds : [NewEmbed] });
                 break;
         }
