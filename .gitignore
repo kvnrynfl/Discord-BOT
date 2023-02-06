@@ -1,6 +1,5 @@
 /node_modules
-deploy-commands.js
-destroy-commands.js
+/commands/owner/*
 config.json
 DevHelp.txt
 .env
