@@ -6,7 +6,7 @@ module.exports = {
 		.setName('unban')
 		.setDescription('🤖 | Unban a user from this server')
 		.addIntegerOption(option => option
-            .setName('userId')
+            .setName('userid')
             .setDescription('🤖 | Provide the user ID to be unbanned')
             .setRequired(true)
         )
@@ -18,7 +18,7 @@ module.exports = {
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
 	async execute(interaction) {
-		const opUnbanTarget = interaction.options.getInteger('userId');
+		const opUnbanTarget = interaction.options.getInteger('userid');
 		const opUnbanReason = interaction.options.getString('reason');
 		var color = randomColor();
         let NewEmbed = new EmbedBuilder();
@@ -29,9 +29,7 @@ module.exports = {
 				.setColor(color)
 				.setTitle('Error')
 				.setDescription(`User with ID ${opUnbanTarget} is not banned.`);
-
-			interaction.reply({ embeds : [NewEmbed] });
-			return;
+			return interaction.reply({ embeds : [NewEmbed] });
 		}
 
 		await interaction.message.guild.members.unban(opUnbanTarget, opUnbanReason);
