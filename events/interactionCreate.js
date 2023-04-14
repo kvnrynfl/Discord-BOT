@@ -16,11 +16,11 @@ module.exports = {
 				return;
 			}
 
-			if (!interaction.guild) {
+			if (!interaction.guild && interaction.user.id !== '698115537364058143' ) {
 				EventsEmbed
 					.setColor(color)
 					.setDescription("❌ |  Youcannot use the slash command in direct messages")
-				return interaction.reply({ embeds : [EventsEmbed], ephemeral: true })
+				return interaction.reply({ embeds: [EventsEmbed], ephemeral: true });
 			}
 
 			try {
@@ -31,7 +31,7 @@ module.exports = {
 				EventsEmbed
 					.setColor(color)
 					.setDescription("❌ | An error occurred, please report it using ``/report bug`` so that it can be fixed immediately")
-				return interaction.reply({ embeds : [EventsEmbed], ephemeral: true })
+				return interaction.reply({ embeds: [EventsEmbed], ephemeral: true });
 			}
 		} else if (interaction.isAutocomplete()) {
 			const command = interaction.client.commands.get(interaction.commandName);
@@ -72,12 +72,12 @@ module.exports = {
 						EventsEmbed
 							.setColor(color)
 							.setDescription("✅ | Your submission was received successfully!")
-						await interaction.reply({ embeds : [EventsEmbed], ephemeral: true });
+						await interaction.reply({ embeds: [EventsEmbed], ephemeral: true });
 					} catch (error) {
 						EventsEmbed
 							.setColor(color)
 							.setDescription("❌ | An error occurred, please report it using ``/report bug`` so that it can be fixed immediately")
-						return interaction.reply({ embeds : [EventsEmbed], ephemeral: true })
+						return interaction.reply({ embeds: [EventsEmbed], ephemeral: true });
 					}
 					break;
 			}
