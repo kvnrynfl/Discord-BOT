@@ -1,5 +1,5 @@
 /node_modules
-/commands/owner/*
+/commands/developer/*
 config.json
 DevHelp.txt
 .env
