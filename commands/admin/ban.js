@@ -3,53 +3,53 @@ const randomColor = require('randomcolor');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-        .setName('Ban')
+        .setName('ban')
         .setDescription('🤖 | Ban a user from this server')
         .addSubcommand(subcommand => subcommand
-            .setName('Temporary')
+            .setName('temporary')
             .setDescription('🤖 | Ban a user temporarily from the server')
             .addUserOption(option => option
-                .setName('User')
+                .setName('user')
                 .setDescription('🤖 | The user to ban')
                 .setRequired(true)
             )
             .addIntegerOption(option => option
-                .setName('Duration')
+                .setName('duration')
                 .setDescription('🤖 | The duration of the ban in days')
                 .setMinValue(1)
                 .setRequired(true)
             )
-            .addReasonOption(option => option
-                .setName('Reason')
+            .addStringOption(option => option
+                .setName('reason')
                 .setDescription('The reason for the ban')
                 .setRequired(true)
             )
         )
         .addSubcommand(subcommand => subcommand
-            .setName('Permanent')
+            .setName('permanent')
             .setDescription('🤖 | Ban a user permanently from the server')
             .addUserOption(option => option
-                .setName('User')
+                .setName('user')
                 .setDescription('🤖 | The user to ban')
                 .setRequired(true)
             )
-            .addReasonOption(option => option
-                .setName('Reason')
+            .addStringOption(option => option
+                .setName('reason')
                 .setDescription('🤖 | The reason for the ban')
                 .setRequired(true)
             )
         )
         .addSubcommand(subcommand => subcommand
-            .setName('Check')
+            .setName('check')
             .setDescription('🤖 | Check the ban status of a user')
             .addIntegerOption(option => option
-                .setName('UserID')
+                .setName('userid')
                 .setDescription('🤖 | The ID of the user to check')
                 .setRequired(true)
             )
         )
         .addSubcommand(subcommand => subcommand
-            .setName('List')
+            .setName('list')
             .setDescription('🤖 | List all banned users in the server')
         )
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
@@ -58,7 +58,7 @@ module.exports = {
         const subcmd = interaction.options.getSubcommand(['temporary', 'permanent', 'check', 'list']);
 		const opBanTarget = interaction.options.getUser('target');
 		const opBanReason = interaction.options.getString('reason');
-        const opBanUserId = interaction.options.getInteger('userId');
+        const opBanUserId = interaction.options.getInteger('userid');
         const opBanDuration = interaction. options.getInteger('duration');
 		var color = randomColor();
         let NewEmbed = new EmbedBuilder();
