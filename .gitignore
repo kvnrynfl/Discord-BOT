@@ -2,4 +2,5 @@
 /commands/developer/*
 config.json
 DevHelp.txt
+pakage-lock.json
 .env
