@@ -1,4 +1,5 @@
 const { Events, EmbedBuilder } = require('discord.js');
+const { interactionDataUpdate } = require('../handlers/databaseHandler');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -22,6 +23,8 @@ module.exports = {
 					.setDescription("❌ |  Youcannot use the slash command in direct messages")
 				return interaction.reply({ embeds: [EventsEmbed], ephemeral: true });
 			}
+			
+			await interactionDataUpdate(interaction);
 
 			try {
 				await command.execute(interaction);
