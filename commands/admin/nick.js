@@ -14,7 +14,8 @@ module.exports = {
 			.setName("nickname")
 			.setDescription("🤖 | Nickname baru untuk user")
 			.setRequired(true)
-		),
+		)
+		.setDMPermission(false),
 	async execute(interaction) {
 		const opNickUser = interaction.options.getUser("user");
 		const opNickNickname = interaction.options.getString("nickname");
