@@ -34,21 +34,6 @@ function loadEvents(client) {
         continue;
     }
 
-    const eventDatabaseFiles = fs.readdirSync('./events/database').filter(file => file.endsWith('.js'));
-
-    for (const file of eventDatabaseFiles) {
-        const event = require(`../events/database/${file}`);
-
-        if (event.once){
-            client.database.once(event.name, (...args) => event.execute(...args, client));
-        } else {
-            client.database.on(event.name, (...args) => event.execute(...args, client));
-        }
-
-        table.addRow("✔", './database/', file)
-        continue;
-    }
-
     return console.log(table.toString());
 }
 
