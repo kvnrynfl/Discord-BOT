@@ -9,7 +9,7 @@ module.exports = {
 		.setName('help')
 		.setDescription('🤖 | Replies with help embed!')
         .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
-        .setDMPermission(false),
+        .setDMPermission(true),
 	async execute(interaction) {
         var color = randomColor();
         let NewEmbed = new EmbedBuilder();
