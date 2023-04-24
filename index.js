@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const { loadEvents } = require("./handlers/eventHandler");
 const { loadCommands } = require("./handlers/commandHandler");
-const { loadDatabase, inputDataUser, findDataUser } = require("./handlers/databaseHandler");
+const { loadDatabase } = require("./handlers/databaseHandler");
 
 const client = new Client({
     intents: [
