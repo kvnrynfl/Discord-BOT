@@ -24,6 +24,7 @@ module.exports = {
                         .setLabel("Full Name")
                         .setStyle(TextInputStyle.Short)
                         .setPlaceholder('Please enter your full name.')
+                        .setRequired(true)
                 );
                 const ARBReportBug2 = new ActionRowBuilder().addComponents(
                     new TextInputBuilder()
@@ -31,6 +32,7 @@ module.exports = {
                         .setLabel("Title")
                         .setStyle(TextInputStyle.Short)
                         .setPlaceholder("Please enter a brief title for the bug report.")
+                        .setRequired(true)
                 );
                 const ARBReportBug3 = new ActionRowBuilder().addComponents(
                     new TextInputBuilder()
@@ -38,6 +40,7 @@ module.exports = {
                         .setLabel("Screenshot URL")
                         .setStyle(TextInputStyle.Short)
                         .setPlaceholder("Please enter the URL of a screenshot (if applicable).")
+                        .setRequired(true)
                 );
                 const ARBReportBug4 = new ActionRowBuilder().addComponents(
                     new TextInputBuilder()
@@ -45,6 +48,7 @@ module.exports = {
                         .setLabel("Description")
                         .setStyle(TextInputStyle.Paragraph)
                         .setPlaceholder("Please describe the bug in detail, including the steps to reproduce it.")
+                        .setRequired(true)
                 );
 
                 const reportBug = new ModalBuilder()
