@@ -194,7 +194,7 @@ async function interactionDataUpdate(interaction) {
         await inputDataGuild(interaction.guild.id, interaction.guild.name, guildOwner.user.id, guildOwner.user.username, guildOwner.user.discriminator, interaction.guild.createdAt);
     } else if (checkDataGuild[0].guildName != interaction.guild.name) {
         await updateNameGuild(interaction.guild.id, interaction.guild.name);
-    } else if (checkDataGuild[0].guildguildOwner.ownerId != guildOwner.user.id || checkDataGuild[0].guildguildOwner.ownerName != guildOwner.user.username || checkDataGuild[0].guildguildOwner.ownerTag != guildOwner.user.discriminator) {
+    } else if (checkDataGuild[0].guildOwner[0].ownerId != guildOwner.user.id || checkDataGuild[0].guildOwner[0].ownerName != guildOwner.user.username || checkDataGuild[0].guildOwner[0].ownerTag != guildOwner.user.discriminator) {
         await updateOwnerGuild(interaction.guild.id, guildOwner.user.id, guildOwner.user.username, guildOwner.user.discriminator);
     }
 }
