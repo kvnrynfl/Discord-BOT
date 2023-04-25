@@ -41,7 +41,7 @@ const guildSchema = new Schema({
         type: String,
         required: true,
     },
-    guildOwner: [{
+    guildOwner: [ {
         ownerId: {
             type: String,
             required: true,
@@ -54,7 +54,7 @@ const guildSchema = new Schema({
             type: String,
             required: true,
         },
-    }],
+    } ],
     createdAt: {
         type: Date,
         required: true,
@@ -72,7 +72,50 @@ guildSchema.pre('save', function (next) {
     next();
 });
 
+const reportBugSchema = new Schema({
+    guildId: {
+        type: Number,
+        required: true,
+    },
+    userId: {
+        type: Number,
+        required: true,
+    },
+    fullName: {
+        type: String,
+        required: true,
+    },
+    title: {
+        type: String,
+        required: true,
+    },
+    screenshotUrl: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true,
+    },
+    status: {
+        type: String,
+        default: "Unread" //Under review //Approved
+    },
+    createdAt: {
+        type: Date,
+        default: () => Date.now(),
+        immutable: true,
+    },
+    updatedAt: Date,
+});
+
+reportBugSchema.pre('save', function (next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
 module.exports = {
     users: model("users", userSchema),
     guilds: model("guilds", guildSchema),
+    reportBugs: model("reportBugs", reportBugSchema),
 };
