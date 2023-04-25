@@ -1,5 +1,5 @@
 const { Events, EmbedBuilder } = require('discord.js');
-const { interactionDataUpdate } = require('../handlers/databaseHandler');
+const { interactionDataUpdate, inputDataReportBug } = require('../handlers/databaseHandler');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -51,27 +51,17 @@ module.exports = {
 				console.error(error);
 			}
 		} else if (interaction.isModalSubmit()) {
-			
 			switch (interaction.customId) {
 				case 'GeneralReportBug':
-					var post  = {
-						user_id: `${interaction.user.id}`,
-						guild_id: `${interaction.guildId}`,
-						fullname: `${interaction.fields.getTextInputValue('InputGeneralReportBug1')}`,
-						whathappened: `${interaction.fields.getTextInputValue('InputGeneralReportBug2')}`
-					};
-
 					try {
-						interaction.client.database.getConnection(async function(err, connection) {
-							if (err) {
-								console.log(err);
-							}
-							await connection.query(`INSERT INTO reportbug SET ?`, post, function(error, result, fields) {
-								if (error) {
-									console.log(`[WARNING] ModalSubmit ReportBug : ${error.message}`);
-								};
-							});
-						});
+						await inputDataReportBug(
+							interaction.guild.id,
+							interaction.user.id,
+							interaction.fields.getTextInputValue('InputGeneralReportBug1'),
+							interaction.fields.getTextInputValue('InputGeneralReportBug2'),
+							interaction.fields.getTextInputValue('InputGeneralReportBug3'),
+							interaction.fields.getTextInputValue('InputGeneralReportBug4'),
+						);
 						EventsEmbed
 							.setColor(color)
 							.setDescription("✅ | Your submission was received successfully!")
