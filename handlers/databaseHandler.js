@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const AsciiTable = require('ascii-table');
 const { users, guilds } = require('../models/mongoDB');
+const { findDataUser, inputDataUser, updateNameUser, updateTagUser} = require('./database/users');
+const { findDataGuild, inputDataGuild, updateNameGuild, updateOwnerGuild } = require('./database/guilds');
 require('dotenv').config();
 
 async function loadDatabase() {
@@ -33,150 +35,6 @@ async function loadDatabase() {
     }
 }
 
-async function findDataUser(uId) {
-    try {
-        await mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            // keepAlive: true,
-        });
-        const user = await users.find({ userId: uId });
-        return user;
-    } catch (error) {
-        console.log(`[ERROR] ${error.message}`);
-        return error;
-    }
-}
-
-async function inputDataUser(uId, uName, uTag, cAt) {
-    try {
-        await mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            // keepAlive: true,
-        });
-        const userData = new users({
-            userId: uId,
-            userName: uName,
-            userTag: uTag,
-            createdAt: cAt
-        });
-
-        await userData.save();
-    } catch (error) {
-        console.log(`[ERROR] ${error.message}`);
-    }
-}
-
-async function updateNameUser(uId, uName) {
-    try {
-        await mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            // keepAlive: true,
-        });
-        const userFind = await users.findOne({ userId: uId }).exec();
-        userFind.userName = uName;
-        await userFind.save();
-    } catch (error) {
-        console.log(`[ERROR] ${error.message}`);
-    }
-}
-
-async function updateTagUser(uId, uTag) {
-    try {
-        await mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            // keepAlive: true,
-        });
-        const userFind = await users.findOne({ userId: uId }).exec();
-        userFind.userTag = uTag;
-        await userFind.save();
-    } catch (error) {
-        console.log(`[ERROR] ${error.message}`);
-    }
-}
-
-async function findDataGuild(gId) {
-    try {
-        await mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            // keepAlive: true,
-        });
-        const guild = await guilds.find({ guildId: gId });
-        return guild;
-    } catch (error) {
-        console.log(`[ERROR] ${error.message}`);
-        return error;
-    }
-}
-
-async function inputDataGuild(gId, gName, oId, oName, oTag, cAt) {
-    try {
-        await mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            // keepAlive: true,
-        });
-        const guildData = new guilds({
-            guildId: gId,
-            guildName: gName,
-            guildOwner: {
-                ownerId: oId,
-                ownerName: oName,
-                ownerTag: oTag,
-            },
-            createdAt: cAt
-        });
-
-        await guildData.save();
-    } catch (error) {
-        console.log(`[ERROR] ${error.message}`);
-    }
-}
-
-async function updateNameGuild(gId, gName) {
-    try {
-        await mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            // keepAlive: true,
-        });
-        const userFind = await guilds.findOne({ guildId: gId }).exec();
-        userFind.guildName = gName;
-        await userFind.save();
-    } catch (error) {
-        console.log(`[ERROR] ${error.message}`);
-    }
-}
-
-async function updateOwnerGuild(gId, oId, oName, oTag) {
-    try {
-        await mongoose.set('strictQuery', false);
-        await mongoose.connect(process.env.DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            // keepAlive: true,
-        });
-        const userFind = await guilds.findOne({ userId: gId }).exec();
-        userFind.guildOwner.ownerId = oId;
-        userFind.guildOwner.ownerName = oName;
-        userFind.guildOwner.ownerTag = oTag;
-        await userFind.save();
-    } catch (error) {
-        console.log(`[ERROR] ${error.message}`);
-    }
-}
-
 async function interactionDataUpdate(interaction) {
     const checkDataUser = await findDataUser(interaction.user.id);
     const checkDataGuild = await findDataGuild(interaction.guild.id)
@@ -201,6 +59,7 @@ async function interactionDataUpdate(interaction) {
 
 module.exports = {
     loadDatabase,
+    interactionDataUpdate,
     findDataUser,
     inputDataUser,
     updateNameUser,
@@ -209,5 +68,4 @@ module.exports = {
     inputDataGuild,
     updateNameGuild,
     updateOwnerGuild,
-    interactionDataUpdate
 };
