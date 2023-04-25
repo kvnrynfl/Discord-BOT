@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { users } = require('../models/mongoDB');
+const { users } = require('../../models/mongoDB');
 require('dotenv').config();
 
 async function findDataUser(uId) {
