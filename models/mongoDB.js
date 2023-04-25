@@ -3,8 +3,9 @@ const { Schema, SchemaType, model } = require("mongoose");
 const userSchema = new Schema({
     userId: {
         type: Number,
-        required: true,
+        index: true,
         unique: true,
+        required: true,
     },
     userName: {
         type: String,
@@ -34,8 +35,9 @@ userSchema.pre('save', function (next) {
 const guildSchema = new Schema({
     guildId: {
         type: Number,
-        required: true,
+        index: true,
         unique: true,
+        required: true,
     },
     guildName: {
         type: String,
@@ -73,13 +75,29 @@ guildSchema.pre('save', function (next) {
 });
 
 const reportBugSchema = new Schema({
+    reportId: {
+        type: Number,
+        index: true,
+        unique: true,
+        required: true,
+        default: function() {
+            return mongoose.model('reportBugs', reportBugSchema).countDocuments().exec().then((count) => {
+                return count + 1;
+            });
+        },
+        immutable: true,
+    },
     guildId: {
         type: Number,
+        index: true,
         required: true,
+        ref: 'guilds'
     },
     userId: {
         type: Number,
+        index: true,
         required: true,
+        ref: 'users',
     },
     fullName: {
         type: String,
@@ -99,7 +117,7 @@ const reportBugSchema = new Schema({
     },
     status: {
         type: String,
-        default: "Unread" //Under review //Approved
+        default: "Unread", //Under review //Approved
     },
     createdAt: {
         type: Date,
@@ -112,6 +130,18 @@ const reportBugSchema = new Schema({
 reportBugSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
+
+    if (!doc.reportId) {
+        mongoose.model('ReportBug', reportBugSchema).findOne().sort({ reportId: -1 }).exec((err, lastDoc) => {
+            if (err) {
+                return next(err);
+            }
+            doc.reportId = lastDoc ? lastDoc.reportId + 1 : 1;
+            next();
+        });
+    } else {
+        next();
+    }
 });
 
 module.exports = {
