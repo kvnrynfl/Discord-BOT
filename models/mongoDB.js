@@ -1,4 +1,6 @@
-const { Schema, SchemaType, model } = require("mongoose");
+const mongoose = require("mongoose");
+const { Schema, model } = mongoose;
+
 
 const userSchema = new Schema({
     userId: {
@@ -80,11 +82,6 @@ const reportBugSchema = new Schema({
         index: true,
         unique: true,
         required: true,
-        default: function() {
-            return mongoose.model('reportBugs', reportBugSchema).countDocuments().exec().then((count) => {
-                return count + 1;
-            });
-        },
         immutable: true,
     },
     guildId: {
@@ -117,7 +114,7 @@ const reportBugSchema = new Schema({
     },
     status: {
         type: String,
-        default: "Unread", //Under review //Approved
+        default: "Unread", //Under review //Approved //Closed
     },
     createdAt: {
         type: Date,
@@ -130,22 +127,14 @@ const reportBugSchema = new Schema({
 reportBugSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
-
-    if (!doc.reportId) {
-        mongoose.model('ReportBug', reportBugSchema).findOne().sort({ reportId: -1 }).exec((err, lastDoc) => {
-            if (err) {
-                return next(err);
-            }
-            doc.reportId = lastDoc ? lastDoc.reportId + 1 : 1;
-            next();
-        });
-    } else {
-        next();
-    }
 });
 
+const users = model("users", userSchema);
+const guilds = model("guilds", guildSchema);
+const reportBugs = model("reportbugs", reportBugSchema);
+
 module.exports = {
-    users: model("users", userSchema),
-    guilds: model("guilds", guildSchema),
-    reportBugs: model("reportBugs", reportBugSchema),
+    users,
+    guilds,
+    reportBugs,
 };

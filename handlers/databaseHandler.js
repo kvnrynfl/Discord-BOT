@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const AsciiTable = require('ascii-table');
-const { users, guilds } = require('../models/mongoDB');
+const { users, guilds, reportBugs } = require('../models/mongoDB');
 const { findDataUser, inputDataUser, updateNameUser, updateTagUser} = require('./database/users');
 const { findDataGuild, inputDataGuild, updateNameGuild, updateOwnerGuild } = require('./database/guilds');
-const { findDataReportBug, inputDataReportBug, updateStatusReportBug } = require('./database/reportBugs');
+const { countDataReportBug, findDataReportBug, inputDataReportBug, updateStatusReportBug } = require('./database/reportBugs');
 require('dotenv').config();
 
 async function loadDatabase() {
@@ -69,6 +69,7 @@ module.exports = {
     inputDataGuild,
     updateNameGuild,
     updateOwnerGuild,
+    countDataReportBug,
     findDataReportBug,
     inputDataReportBug,
     updateStatusReportBug
