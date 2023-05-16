@@ -6,24 +6,24 @@ require('dotenv').config();
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('quotes')
-        .setDescription('🤖 | ')
+        .setDescription('🤖 | Quote command')
         .addSubcommand(subcommand => subcommand
             .setName('find')
-            .setDescription('🤖 | ')
+            .setDescription('🤖 | Find a quote by category')
             .addStringOption(option => option
                 .setName('category')
-                .setDescription('🤖 | ')
+                .setDescription('🤖 | The category of the quote')
                 .setRequired(true)
                 .setAutocomplete(true)
             )
         )
         .addSubcommand(subcommand => subcommand
             .setName('help')
-            .setDescription('🤖 | ')
+            .setDescription('🤖 | Get help with using the quotes command')
         )
         .addSubcommand(subcommand => subcommand
             .setName('random')
-            .setDescription('🤖 | ')
+            .setDescription('🤖 | Get a random quote')
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
         .setDMPermission(false),
