@@ -196,7 +196,7 @@ module.exports = {
                 NewEmbed
                     .setColor(color)
                     .addFields(
-                        // { name: 'Admin', value: `${infoCommands('admin')}` },
+                        { name: 'Admin', value: `${infoCommands('admin')}` },
                         { name: 'General', value: `${infoCommands('general').join(', ')}` },
                         { name: 'Music', value: `${infoCommands('music').join(', ')}` },
                     )

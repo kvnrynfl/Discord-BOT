@@ -9,10 +9,42 @@ module.exports = {
         .addSubcommand(subcommand => subcommand
             .setName('view')
             .setDescription('🎵 | Menampilkan music status')
-            .addNumberOption((option) => option
+            .addIntegerOption((option) => option
                 .setName('page')
                 .setDescription('🎵 | Enter the queue page number')
                 .setMinValue(1)
+            )
+        )
+        .addSubcommand(subcommand => subcommand
+            .setName('move')
+            .setDescription('🎵 | Move music positions in the queue')    
+            .addIntegerOption((option) => option
+                .setName('track')
+                .setDescription(`🎵 | Enter track number of queues | if you don't know, you can use /queue`)
+                .setMinValue(1)
+                .setRequired(true)
+            )
+            .addIntegerOption((option) => option
+                .setName('position')
+                .setDescription(`🎵 | Enter position number of queues | if you don't know, you can use /queue`)
+                .setMinValue(1)
+                .setRequired(true)
+            )
+        )
+        .addSubcommand(subcommand => subcommand
+            .setName('swap')
+            .setDescription('🎵 | Swap music positions in the queue')  
+            .addIntegerOption((option) => option
+                .setName('track1')
+                .setDescription(`🎵 | Enter track number of queues | if you don't know, you can use /queue`)
+                .setMinValue(1)
+                .setRequired(true)
+            )
+            .addIntegerOption((option) => option
+                .setName('track2')
+                .setDescription(`🎵 | Enter track number of queues | if you don't know, you can use /queue`)
+                .setMinValue(1)
+                .setRequired(true)
             )
         )
         .addSubcommand(subcommand => subcommand
@@ -37,9 +69,9 @@ module.exports = {
         .addSubcommand(subcommand => subcommand
             .setName('remove')
             .setDescription('🎵 | Delete the music that is in the queue')
-            .addNumberOption((option) => option
+            .addIntegerOption((option) => option
                 .setName('number')
-                .setDescription(`🎵 | Enter the number of queues | if you don't know, you can use /queue`)
+                .setDescription(`🎵 | Enter track number of queues | if you don't know, you can use /queue`)
                 .setMinValue(1)
                 .setRequired(true)
             )
@@ -51,7 +83,7 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
         .setDMPermission(false),
     async execute(interaction) {
-        const subcmd = interaction.options.getSubcommand(["view", "shuffle", "loop", "remove"]);
+        const subcmd = interaction.options.getSubcommand(["view", "move", "swap", "shuffle", "loop", "remove"]);
         var color = randomColor();
         let NewEmbed = new EmbedBuilder();
 
@@ -89,7 +121,7 @@ module.exports = {
 
         switch (subcmd) {
             case 'view':
-                const opViewPage = (interaction.options.getNumber('page') || 1) - 1;
+                const opViewPage = (interaction.options.getInteger('page') || 1) - 1;
                 if (countQueue < 1) {
                     NewEmbed
                         .setColor(color)
@@ -121,6 +153,77 @@ module.exports = {
                 interaction.reply({ embeds : [NewEmbed] });
                 break;
 
+            case 'move':
+                const opMoveTrack = interaction.options.getInteger('track') - 1;
+                const opMovePosition = interaction.options.getInteger('position') - 1;
+                if (countQueue < 1) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | There are no music in the queue, use command \`/nowplaying\` to see the music currently playing**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                } else if (countQueue == 1) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | There are only 1 music in the queue**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                } else if (opMoveTrack > countQueue) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | Invalid Track Number. There are only a total of ${countQueue} queue**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                } else if (opMovePosition > countQueue) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | Invalid Position Number. There are only a total of ${countQueue} queue**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                }
+
+                const track = await getQueue.remove(opMoveTrack);
+                await getQueue.insert(track, opMovePosition);
+                NewEmbed
+                    .setColor(color)
+                    .setDescription(`**✅ | Successfully move music in queue number ${opMoveTrack + 1} to queue number${opMovePosition + 1}**`)
+                interaction.reply({ embeds: [NewEmbed] });
+                break;
+
+            case 'swap':
+                const queueNumbers = [interaction.options.getInteger('track1') - 1, interaction.options.getInteger('track2') - 1];
+                if (countQueue < 1) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | There are no music in the queue, use command \`/nowplaying\` to see the music currently playing**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                } else if (countQueue == 1) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | There are only 1 music in the queue**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                } else if (queueNumbers[0] > countQueue) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | Invalid Track1 Number. There are only a total of ${countQueue} queue**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                } else if (queueNumbers[1] > countQueue) {
+                    NewEmbed
+                        .setColor(color)
+                        .setDescription(`**❌ | Invalid Track2 Number. There are only a total of ${countQueue} queue**`)
+                    return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
+                }
+
+                queueNumbers.sort(function (a, b) {
+                    return a - b;
+                });
+
+                const track2 = queue.remove(queueNumbers[1]);
+                const track1 = queue.remove(queueNumbers[0]);
+                queue.insert(track2, queueNumbers[0]);
+                queue.insert(track1, queueNumbers[1]);
+
+                NewEmbed
+                    .setColor(color)
+                    .setDescription(`**✅ | Successfully swapped music queue number ${queueNumbers[0] + 1} with queue number${queueNumbers[1] + 1}**`)
+                interaction.reply({ embeds: [NewEmbed] });
+                break;
             case 'shuffle':
                 if (countQueue < 1) {
                     NewEmbed
@@ -186,7 +289,7 @@ module.exports = {
                 break;
 
             case 'remove':
-                const opRemoveNumber = interaction.option.getNumber('number');
+                const opRemoveNumber = interaction.option.getInteger('number');
                 if (countQueue < 1) {
                     NewEmbed
                         .setColor(color)
@@ -195,7 +298,7 @@ module.exports = {
                 } else if (opRemoveNumber > countQueue) {
                     NewEmbed
                         .setColor(color)
-                        .setDescription(`**❌ | Invalid Number. There are only a total of ${countQueue} queue**`)
+                        .setDescription(`**❌ | Invalid Track Number. There are only a total of ${countQueue} queue**`)
                     return interaction.reply({ embeds : [NewEmbed], ephemeral : true });
                 }
 
@@ -203,7 +306,7 @@ module.exports = {
 
                 NewEmbed
                     .setColor(color)
-                    .setDescription(`**⏭ | Successfully skip music to queue number ${opRemoveNumber}**`)
+                    .setDescription(`**✅ | Successfully deleted music in queue number ${opRemoveNumber}**`)
                 interaction.reply({ embeds : [NewEmbed] });
                 break;
 

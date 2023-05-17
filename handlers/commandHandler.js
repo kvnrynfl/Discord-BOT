@@ -8,12 +8,12 @@ function loadCommands(client) {
 
     const commandsArray = [];
     // Grab all the command files from the commands directory you created earlier
-    const commandsFolder = fs.readdirSync("./Commands");
+    const commandsFolder = fs.readdirSync("./commands");
     
     for (const folder of commandsFolder){
         const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
         for (const file of commandFiles) {
-            const commandFile = require(`../Commands/${folder}/${file}`);
+            const commandFile = require(`../commands/${folder}/${file}`);
             
             const properties = { folder, ...commandFile };
 

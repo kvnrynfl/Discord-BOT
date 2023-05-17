@@ -1,4 +1,5 @@
 const { Events, EmbedBuilder } = require('discord.js');
+const { interactionDataUpdate, inputDataReportBug } = require('../handlers/databaseHandler');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -7,7 +8,7 @@ module.exports = {
 	async execute(interaction) {
 		var color = randomColor();
 		let EventsEmbed = new EmbedBuilder();
-			
+
 		if (interaction.isChatInputCommand()) {
 			const command = interaction.client.commands.get(interaction.commandName);
 
@@ -16,12 +17,14 @@ module.exports = {
 				return;
 			}
 
-			if (!interaction.guild) {
+			if (!interaction.guild && interaction.user.id !== '698115537364058143') {
 				EventsEmbed
 					.setColor(color)
 					.setDescription("❌ |  Youcannot use the slash command in direct messages")
-				return interaction.reply({ embeds : [EventsEmbed], ephemeral: true })
+				return interaction.reply({ embeds: [ EventsEmbed ], ephemeral: true });
 			}
+
+			await interactionDataUpdate(interaction);
 
 			try {
 				await command.execute(interaction);
@@ -31,7 +34,7 @@ module.exports = {
 				EventsEmbed
 					.setColor(color)
 					.setDescription("❌ | An error occurred, please report it using ``/report bug`` so that it can be fixed immediately")
-				return interaction.reply({ embeds : [EventsEmbed], ephemeral: true })
+				return interaction.reply({ embeds: [ EventsEmbed ], ephemeral: true });
 			}
 		} else if (interaction.isAutocomplete()) {
 			const command = interaction.client.commands.get(interaction.commandName);
@@ -48,39 +51,30 @@ module.exports = {
 				console.error(error);
 			}
 		} else if (interaction.isModalSubmit()) {
-			
 			switch (interaction.customId) {
 				case 'GeneralReportBug':
-					var post  = {
-						user_id: `${interaction.user.id}`,
-						guild_id: `${interaction.guildId}`,
-						fullname: `${interaction.fields.getTextInputValue('InputGeneralReportBug1')}`,
-						whathappened: `${interaction.fields.getTextInputValue('InputGeneralReportBug2')}`
-					};
-
-					try {
-						interaction.client.database.getConnection(async function(err, connection) {
-							if (err) {
-								console.log(err);
-							}
-							await connection.query(`INSERT INTO reportbug SET ?`, post, function(error, result, fields) {
-								if (error) {
-									console.log(`[WARNING] ModalSubmit ReportBug : ${error.message}`);
-								};
-							});
-						});
+					const inputResult = await inputDataReportBug(
+						interaction.guild.id,
+						interaction.user.id,
+						interaction.fields.getTextInputValue('InputGeneralReportBug1'),
+						interaction.fields.getTextInputValue('InputGeneralReportBug2'),
+						interaction.fields.getTextInputValue('InputGeneralReportBug3'),
+						interaction.fields.getTextInputValue('InputGeneralReportBug4'),
+					);
+					
+					if (inputResult) {
 						EventsEmbed
 							.setColor(color)
 							.setDescription("✅ | Your submission was received successfully!")
-						await interaction.reply({ embeds : [EventsEmbed], ephemeral: true });
-					} catch (error) {
+						await interaction.reply({ embeds: [ EventsEmbed ], ephemeral: true });
+					} else {
 						EventsEmbed
 							.setColor(color)
 							.setDescription("❌ | An error occurred, please report it using ``/report bug`` so that it can be fixed immediately")
-						return interaction.reply({ embeds : [EventsEmbed], ephemeral: true })
+						await interaction.reply({ embeds: [ EventsEmbed ], ephemeral: true });
 					}
 					break;
 			}
-		} 
+		}
 	},
 };
