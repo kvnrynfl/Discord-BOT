@@ -41,18 +41,20 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+client.buttons = new Collection();
 
-client.player = new Player(client, {
+const player = new Player(client, {
     ytdlOptions: {
         filter: "audioonly",
-        opusEncoded: true,
         quality: "highestaudio",
         highWaterMark: 1 << 30
     }
 });
 
+await player.extractors.loadDefault();
+
 client.login(process.env.CLIENT_TOKEN).then(() => {
-    loadEvents(client);
+    loadEvents(client, player);
     loadCommands(client);
     loadDatabase();
 });
