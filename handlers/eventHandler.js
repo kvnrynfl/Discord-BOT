@@ -1,7 +1,7 @@
 const AsciiTable = require('ascii-table');
 const fs = require('node:fs');
 
-function loadEvents(client) {
+function loadEvents(client, player) {
     const table = new AsciiTable().setHeading('Status', 'Path', 'File').setAlignCenter(0);
 
     const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
@@ -25,9 +25,9 @@ function loadEvents(client) {
         const event = require(`../events/player/${file}`);
 
         if (event.once){
-            client.player.once(event.name, (...args) => event.execute(...args, client));
+            player.events.once(event.name, (...args) => event.execute(...args, client));
         } else {
-            client.player.on(event.name, (...args) => event.execute(...args, client));
+            player.events.on(event.name, (...args) => event.execute(...args, client));
         }
 
         table.addRow("✔", './player/', file)
