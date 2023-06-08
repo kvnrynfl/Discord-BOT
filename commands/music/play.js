@@ -1,11 +1,11 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType  } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType } = require('discord.js');
 const { useMasterPlayer, QueryType, QueueRepeatMode } = require("discord-player");
 const randomColor = require('randomcolor');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('play')
-		.setDescription('🎵 | Started playing music')
+    data: new SlashCommandBuilder()
+        .setName('play')
+        .setDescription('🎵 | Started playing music')
         .addStringOption((option) => option
             .setName('track')
             .setDescription('🎵 | Enter the Title/URL/PlayList you want to play')
@@ -24,20 +24,20 @@ module.exports = {
             requestedBy: interaction.user,
             searchEngine: QueryType.AUTO,
         });
-        
+
         if (!result || !result.tracks.length) return;
 
-        const resultFilter = result.tracks.filter(res => 
-			res.title.toLowerCase().includes(focusedValue.toLowerCase())
-		).sort((a, b) => 
-			b.views - a.views
-		);
+        const resultFilter = result.tracks.filter(res =>
+            res.title.toLowerCase().includes(focusedValue.toLowerCase())
+        ).sort((a, b) =>
+            b.views - a.views
+        );
 
         await interaction.respond(
-			resultFilter.slice(0, 10).map(res => (
-				{ name: `[ ${res.duration} ] ${res.title.slice(0, 85)}`, value: res.url }
-			)),
-		);
+            resultFilter.slice(0, 10).map(res => (
+                { name: `[ ${res.duration} ] ${res.title.slice(0, 85)}`, value: res.url }
+            )),
+        );
     },
     async execute(interaction) {
         const opPlayTrack = interaction.options.getString('track');
@@ -50,15 +50,15 @@ module.exports = {
             MusicEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must in a voice channel to use this command**`)
-            return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
+            return interaction.reply({ embeds: [ MusicEmbed ], ephemeral: true });
         }
 
         if (interaction.guild.members.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.members.me.voice.channelId) {
             MusicEmbed
                 .setColor(color)
                 .setDescription(`**❌ | You must be on the same voice channel to use this command**`)
-			return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
-		}
+            return interaction.reply({ embeds: [ MusicEmbed ], ephemeral: true });
+        }
 
         let queue = player.nodes.get(interaction.guild.id);
 
@@ -92,7 +92,7 @@ module.exports = {
                 MusicEmbed
                     .setColor(color)
                     .setDescription(`**❌ | Unable to join your voice channel**`)
-                return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
+                return interaction.reply({ embeds: [ MusicEmbed ], ephemeral: true });
             }
         }
 
@@ -105,7 +105,7 @@ module.exports = {
             MusicEmbed
                 .setColor(color)
                 .setDescription(`**❌ | No Songs/Videos/Playlists found when searching : ${opPlayTrack}**`)
-            return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
+            return interaction.reply({ embeds: [ MusicEmbed ], ephemeral: true });
         }
 
         if (result.playlist) {
@@ -128,12 +128,12 @@ module.exports = {
                     `**Title** : ${playlist.title}\n` +
                     `**Track Size** : ${song.length}\n` +
                     `**Description** : ${playlist.description}\n` +
-                    `${song.slice(0, 10).map((song, i) => `**${i+1}.** \`[${song.duration}]\` ${song.title}`).join("\n")}`
+                    `${song.slice(0, 10).map((song, i) => `**${i + 1}.** \`[${song.duration}]\` ${song.title}`).join("\n")}`
                 )
                 .setThumbnail(playlist.thumbnail.url)
-            return interaction.reply({ embeds : [MusicEmbed] });
+            return interaction.reply({ embeds: [ MusicEmbed ] });
         } else if (result.tracks.length == 1) {
-            const song = result.tracks[0];
+            const song = result.tracks[ 0 ];
 
             try {
                 await queue.addTrack(song);
@@ -154,7 +154,7 @@ module.exports = {
                     `**Request By** : <@${song.requestedBy.id}>\n`
                 )
                 .setThumbnail(song.thumbnail)
-            return interaction.reply({ embeds : [MusicEmbed] });
+            return interaction.reply({ embeds: [ MusicEmbed ] });
         } else if (result.tracks.length > 1) {
             if (result.tracks.length > 10) {
                 var resultLength = 10;
@@ -162,10 +162,10 @@ module.exports = {
                 var resultLength = result.tracks.length;
             }
 
-            const resultembed = result.tracks.slice(0, resultLength).map((song, i) => 
+            const resultembed = result.tracks.slice(0, resultLength).map((song, i) =>
                 `**${i + 1}.** \`[${song.duration}]\` ${song.title}`
             ).join(`\n`);
-            
+
             const resultoption = result.tracks.slice(0, resultLength).map((song, i) => (
                 {
                     label: `${i + 1}. ${song.title.substring(0, 95)}`,
@@ -186,17 +186,17 @@ module.exports = {
 
             const ARBplay1 = new ActionRowBuilder().addComponents(SSMBplay1);
 
-            const message = await interaction.reply({ embeds : [MusicEmbed], components : [ARBplay1], ephemeral : true, fetchReply : true });
+            const message = await interaction.reply({ embeds: [ MusicEmbed ], components: [ ARBplay1 ], ephemeral: true, fetchReply: true });
 
             const filter = (i) => i.customId === 'MusicPlay' && i.user.id === interaction.user.id;
 
             const collector = message.createMessageComponentCollector({ filter, componentType: ComponentType.StringSelect, time: 15000 });
-            
-            collector.on('collect', async(i) => {
+
+            collector.on('collect', async (i) => {
                 await interaction.deleteReply();
 
                 let value = i.values;
-                let song = result.tracks[value];
+                let song = result.tracks[ value ];
 
                 try {
                     await queue.addTrack(song);
@@ -217,18 +217,18 @@ module.exports = {
                         `**Request By** : <@${song.requestedBy.id}>`
                     )
                     .setThumbnail(song.thumbnail)
-                i.reply({ embeds : [CollectorEmbed] });
+                i.reply({ embeds: [ CollectorEmbed ] });
             });
 
             collector.on('end', async (collected) => {
-                if (!collected.size){
+                if (!collected.size) {
                     interaction.deleteReply();
                     CollectorEmbed
                         .setColor(color)
                         .setDescription(`**❌ | Timeout, Use the command \`/play\` again**`)
-                    interaction.followUp({ embeds : [CollectorEmbed], ephemeral : true });
+                    interaction.followUp({ embeds: [ CollectorEmbed ], ephemeral: true });
                 }
-            });            
+            });
         }
     },
 };
