@@ -1,6 +1,6 @@
 /node_modules
 /commands/developer/*
-config.json
-DevHelp.txt
-package-lock.json
 .env
+config.json
+package-lock.json
+Dev*.txt
