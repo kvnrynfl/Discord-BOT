@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType  } = require('discord.js');
-const { QueryType } = require("discord-player");
+const { useMasterPlayer, QueryType, QueueRepeatMode } = require("discord-player");
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -15,9 +15,12 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.Connect)
         .setDMPermission(false),
     async autocomplete(interaction) {
+        const player = useMasterPlayer();
         const focusedValue = interaction.options.getFocused();
 
-        const result = await interaction.client.player.search(focusedValue, {
+        if (!focusedValue) return;
+
+        const result = await player.search(focusedValue, {
             requestedBy: interaction.user,
             searchEngine: QueryType.AUTO,
         });
@@ -40,10 +43,8 @@ module.exports = {
         const opPlayTrack = interaction.options.getString('track');
         let color = randomColor();
         let MusicEmbed = new EmbedBuilder();
-
-        const createQueue = await interaction.client.player.createQueue(interaction.guild,{
-            metadata: interaction.channel
-        });
+        let CollectorEmbed = new EmbedBuilder();
+        const player = useMasterPlayer();
 
         if (!interaction.member.voice.channel) {
             MusicEmbed
@@ -59,24 +60,48 @@ module.exports = {
 			return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
 		}
 
-        try {
-			if (!createQueue.connection) {
-				await createQueue.connect(interaction.member.voice.channel);
-			}
-		} catch {
-			createQueue.destroy();
-            MusicEmbed
-                .setColor(color)
-                .setDescription(`**❌ | Unable to join your voice channel**`)
-            return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
-		}
+        let queue = player.nodes.get(interaction.guild.id);
 
-        const result = await interaction.client.player.search(opPlayTrack, {
+        if (!queue) {
+            player.nodes.create(interaction.guild, {
+                metadata: {
+                    channel: interaction.channel,
+                    client: interaction.guild.members.me,
+                    requestedBy: interaction.user,
+                },
+                repeatMode: QueueRepeatMode.OFF, // OFF = 0, TRACK = 1, QUEUE = 2, AUTOPLAY = 3
+                volume: 100,
+                selfDeaf: true,
+                leaveOnEmpty: true,
+                leaveOnEmptyCooldown: 300000,
+                leaveOnEnd: true,
+                leaveOnEndCooldown: 300000,
+                leaveOnStop: true,
+                leaveOnStopCooldown: 300000,
+            });
+
+            queue = player.nodes.get(interaction.guild.id);
+        }
+
+        if (!queue.connection) {
+            try {
+                await queue.connect(interaction.member.voice.channel);
+            } catch (error) {
+                await queue.delete();
+
+                MusicEmbed
+                    .setColor(color)
+                    .setDescription(`**❌ | Unable to join your voice channel**`)
+                return interaction.reply({ embeds : [MusicEmbed], ephemeral : true });
+            }
+        }
+
+        const result = await player.search(opPlayTrack, {
             requestedBy: interaction.user,
             searchEngine: QueryType.AUTO,
         });
 
-        if (!result || !result.tracks.length) {
+        if (!result || !result.tracks || !result.tracks.length) {
             MusicEmbed
                 .setColor(color)
                 .setDescription(`**❌ | No Songs/Videos/Playlists found when searching : ${opPlayTrack}**`)
@@ -86,7 +111,13 @@ module.exports = {
         if (result.playlist) {
             const song = result.tracks;
             const playlist = result.playlist;
-            await createQueue.addTracks(song);
+
+            try {
+                await queue.addTrack(song);
+                if (!queue.node.isPlaying()) queue.node.play();
+            } catch (error) {
+                console.log(error);
+            }
 
             MusicEmbed
                 .setColor(color)
@@ -100,15 +131,16 @@ module.exports = {
                     `${song.slice(0, 10).map((song, i) => `**${i+1}.** \`[${song.duration}]\` ${song.title}`).join("\n")}`
                 )
                 .setThumbnail(playlist.thumbnail.url)
-
-            if (!createQueue.playing) {
-                await createQueue.play();
-            }
-
             return interaction.reply({ embeds : [MusicEmbed] });
         } else if (result.tracks.length == 1) {
             const song = result.tracks[0];
-            await createQueue.addTrack(song);
+
+            try {
+                await queue.addTrack(song);
+                if (!queue.node.isPlaying()) queue.node.play();
+            } catch (error) {
+                console.log(error);
+            }
 
             MusicEmbed
                 .setColor(color)
@@ -122,24 +154,19 @@ module.exports = {
                     `**Request By** : <@${song.requestedBy.id}>\n`
                 )
                 .setThumbnail(song.thumbnail)
-
-            if (!createQueue.playing) {
-                await createQueue.play();
-            }
-
             return interaction.reply({ embeds : [MusicEmbed] });
         } else if (result.tracks.length > 1) {
             if (result.tracks.length > 10) {
-                var resultlength = 10;
+                var resultLength = 10;
             } else {
-                var resultlength = result.tracks.length;
+                var resultLength = result.tracks.length;
             }
 
-            const resultembed = result.tracks.slice(0, resultlength).map((song, i) => 
+            const resultembed = result.tracks.slice(0, resultLength).map((song, i) => 
                 `**${i + 1}.** \`[${song.duration}]\` ${song.title}`
             ).join(`\n`);
             
-            const resultoption = result.tracks.slice(0, resultlength).map((song, i) => (
+            const resultoption = result.tracks.slice(0, resultLength).map((song, i) => (
                 {
                     label: `${i + 1}. ${song.title.substring(0, 95)}`,
                     description: `Duration : ${song.duration}  ||  Views ${song.views}`,
@@ -163,21 +190,19 @@ module.exports = {
 
             const filter = (i) => i.customId === 'MusicPlay' && i.user.id === interaction.user.id;
 
-            const collector = await message.createMessageComponentCollector({ filter, componentType: ComponentType.StringSelect, time: 15000 });
-
-            let CollectorEmbed = new EmbedBuilder();
+            const collector = message.createMessageComponentCollector({ filter, componentType: ComponentType.StringSelect, time: 15000 });
             
-            collector.on('collect', async i => {
-                interaction.deleteReply();
-                console.log(`Collector | MusicPlay: <@${i.user.id}> using \`/play\` command, and clicked the \`${i.customId}\` menu button with a value of \`${i.values}\``);
+            collector.on('collect', async(i) => {
+                await interaction.deleteReply();
 
                 let value = i.values;
                 let song = result.tracks[value];
 
-                await createQueue.addTrack(song);
-
-                if (!createQueue.playing) {
-                    await createQueue.play();
+                try {
+                    await queue.addTrack(song);
+                    if (!queue.node.isPlaying()) queue.node.play();
+                } catch (error) {
+                    console.log(error);
                 }
 
                 CollectorEmbed
@@ -192,8 +217,9 @@ module.exports = {
                         `**Request By** : <@${song.requestedBy.id}>`
                     )
                     .setThumbnail(song.thumbnail)
-                await i.reply({ embeds : [CollectorEmbed] });
+                i.reply({ embeds : [CollectorEmbed] });
             });
+
             collector.on('end', async (collected) => {
                 if (!collected.size){
                     interaction.deleteReply();
