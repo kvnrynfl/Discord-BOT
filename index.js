@@ -51,7 +51,7 @@ const player = new Player(client, {
     }
 });
 
-await player.extractors.loadDefault();
+player.extractors.loadDefault();
 
 client.login(process.env.CLIENT_TOKEN).then(() => {
     loadEvents(client, player);
