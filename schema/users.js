@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+const { Schema } = require("mongoose");
 
 const userSchema = new Schema({
     userId: {
@@ -16,11 +15,11 @@ const userSchema = new Schema({
         type: Number,
         required: true,
     },
-    createdAt: {
+    registerAt: {
         type: Date,
         required: true,
     },
-    registerAt: {
+    createdAt: {
         type: Date,
         default: () => Date.now(),
         immutable: true,
