@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+const { Schema, Types } = require("mongoose");
 
 const reportBugSchema = new Schema({
     reportId: {
@@ -9,17 +8,15 @@ const reportBugSchema = new Schema({
         required: true,
         immutable: true,
     },
-    guildId: {
-        type: Number,
-        index: true,
+    guild: {
+        type: Types.ObjectId,
+        ref: "guilds",
         required: true,
-        ref: 'guilds'
     },
-    userId: {
-        type: Number,
-        index: true,
+    users: {
+        type: Types.ObjectId,
+        ref: "users",
         required: true,
-        ref: 'users',
     },
     fullName: {
         type: String,

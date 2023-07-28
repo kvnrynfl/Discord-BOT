@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+const { Schema, Types } = require("mongoose");
 
 const guildSchema = new Schema({
     guildId: {
@@ -12,25 +11,15 @@ const guildSchema = new Schema({
         type: String,
         required: true,
     },
-    guildOwner: [ {
-        ownerId: {
-            type: String,
-            required: true,
-        },
-        ownerName: {
-            type: String,
-            required: true,
-        },
-        ownerTag: {
-            type: String,
-            required: true,
-        },
-    } ],
-    createdAt: {
+    guildOwner: {
+        type: Types.ObjectId,
+        ref: "users",
+    },
+    registerAt: {
         type: Date,
         required: true,
     },
-    registerAt: {
+    createdAt: {
         type: Date,
         default: () => Date.now(),
         immutable: true,
