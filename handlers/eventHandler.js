@@ -2,12 +2,12 @@ const AsciiTable = require('ascii-table');
 const fs = require('node:fs');
 
 function loadEvents(client, player) {
-    const table = new AsciiTable().setHeading('Status', 'Path', 'File').setAlignCenter(0);
+    const table = new AsciiTable().setHeading('Status', 'Category', 'File').setAlignCenter(0);
 
-    const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+    const eventClientFiles = fs.readdirSync('./events/client').filter(file => file.endsWith('.js'));
 
-    for (const file of eventFiles) {
-        const event = require(`../events/${file}`);
+    for (const file of eventClientFiles) {
+        const event = require(`../client/${file}`);
 
         if (event.once) {
             client.once(event.name, (...args) => event.execute(...args, client));
@@ -15,22 +15,22 @@ function loadEvents(client, player) {
             client.on(event.name, (...args) => event.execute(...args, client));
         }
 
-        table.addRow("✔", './', file);
+        table.addRow("✔", 'client', file);
         continue;
     }
-    
+
     const eventPlayerFiles = fs.readdirSync('./events/player').filter(file => file.endsWith('.js'));
 
     for (const file of eventPlayerFiles) {
         const event = require(`../events/player/${file}`);
 
-        if (event.once){
+        if (event.once) {
             player.events.once(event.name, (...args) => event.execute(...args, client));
         } else {
             player.events.on(event.name, (...args) => event.execute(...args, client));
         }
 
-        table.addRow("✔", './player/', file)
+        table.addRow("✔", 'player', file)
         continue;
     }
 
