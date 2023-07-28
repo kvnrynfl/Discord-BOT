@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { guilds } = require('../../models/mongoDB');
+const { guilds } = require('../../models/database');
 require('dotenv').config();
 
 async function findDataGuild(gId) {

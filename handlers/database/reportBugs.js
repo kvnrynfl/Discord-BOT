@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { reportBugs } = require('../../models/mongoDB');
+const { reportbugs } = require('../../models/database');
 require('dotenv').config();
 
 async function countDataReportBug() {
@@ -11,7 +11,7 @@ async function countDataReportBug() {
             // keepAlive: true,
         });
 
-        const count = await reportBugs.countDocuments();
+        const count = await reportbugs.countDocuments();
         return count;
     } catch (error) {
         console.log(`[ERROR] ${error.message}`);
@@ -27,7 +27,7 @@ async function findDataReportBug(userId) {
             useUnifiedTopology: true,
             // keepAlive: true,
         });
-        const reportBugFind = await reportBugs.find({ userId: userId });
+        const reportBugFind = await reportbugs.find({ userId: userId });
         return reportBugFind;
     } catch (error) {
         console.log(`[ERROR] ${error.message}`);
@@ -44,7 +44,7 @@ async function inputDataReportBug(guildId, userId, fullName, title, screenshotUr
             // keepAlive: true,
         });
         const reportId = await countDataReportBug() + 1;
-        const reportBugData = new reportBugs({
+        const reportBugData = new reportbugs({
             reportId: reportId,
             guildId: guildId,
             userId: userId,
@@ -70,7 +70,7 @@ async function updateStatusReportBug(reportId, status) {
             useUnifiedTopology: true,
             // keepAlive: true,
         });
-        const reportBugFind = await reportBugs.findOne({ reportId: reportId }).exec();
+        const reportBugFind = await reportbugs.findOne({ reportId: reportId }).exec();
         reportBugFind.status = status;
         await reportBugFind.save();
     } catch (error) {
