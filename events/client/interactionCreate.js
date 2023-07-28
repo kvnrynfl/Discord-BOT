@@ -1,5 +1,5 @@
 const { Events, EmbedBuilder } = require('discord.js');
-const { interactionDataUpdate, inputDataReportBug } = require('../handlers/databaseHandler');
+const { interactionDataUpdate, inputDataReportBug } = require('../../handlers/databaseHandler');
 const randomColor = require('randomcolor');
 
 module.exports = {
@@ -61,7 +61,7 @@ module.exports = {
 						interaction.fields.getTextInputValue('InputGeneralReportBug3'),
 						interaction.fields.getTextInputValue('InputGeneralReportBug4'),
 					);
-					
+
 					if (inputResult) {
 						EventsEmbed
 							.setColor(color)
