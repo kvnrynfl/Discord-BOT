@@ -1,8 +1,8 @@
 const { model } = require("mongoose");
 
-const { userSchema } = require('../schema/user');
-const { guildSchema } = require('../schema/guild');
-const { reportBugSchema } = require('../schema/reportBug');
+const { userSchema } = require('./schemas/user');
+const { guildSchema } = require('./schemas/guild');
+const { reportBugSchema } = require('./schemas/reportBug');
 
 const users = model("users", userSchema);
 const guilds = model("guilds", guildSchema);
