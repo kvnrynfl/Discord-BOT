@@ -1,17 +1,17 @@
 const { Schema } = require("mongoose");
 
 const userSchema = new Schema({
-    userId: {
+    id: {
         type: Number,
         index: true,
         unique: true,
         required: true,
     },
-    userName: {
+    name: {
         type: String,
         required: true,
     },
-    userTag: {
+    tag: {
         type: Number,
         required: true,
     },
