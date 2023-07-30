@@ -1,17 +1,17 @@
 const { Schema, Types } = require("mongoose");
 
 const guildSchema = new Schema({
-    guildId: {
+    id: {
         type: Number,
         index: true,
         unique: true,
         required: true,
     },
-    guildName: {
+    name: {
         type: String,
         required: true,
     },
-    guildOwner: {
+    owner: {
         type: Types.ObjectId,
         ref: "users",
     },
