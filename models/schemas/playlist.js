@@ -1,6 +1,6 @@
 const { Schema, Types } = require("mongoose");
 
-const guildSchema = new Schema({
+const playlistSchema = new Schema({
     name: {
         type: Number,
         index: true,
@@ -27,7 +27,9 @@ const guildSchema = new Schema({
     updatedAt: Date,
 });
 
-guildSchema.pre('save', function (next) {
+playlistSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
 });
+
+module.exports = { playlistSchema };
