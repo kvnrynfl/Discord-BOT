@@ -19,6 +19,10 @@ const playlistSchema = new Schema({
         type: Types.ObjectId,
         ref: "users",
     },
+    active: {
+        type: Boolean,
+        default: true,
+    },
     createdAt: {
         type: Date,
         default: () => Date.now(),
