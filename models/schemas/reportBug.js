@@ -1,7 +1,7 @@
 const { Schema, Types } = require("mongoose");
 
 const reportBugSchema = new Schema({
-    reportId: {
+    id: {
         type: Number,
         index: true,
         unique: true,
@@ -13,12 +13,12 @@ const reportBugSchema = new Schema({
         ref: "guilds",
         required: true,
     },
-    users: {
+    user: {
         type: Types.ObjectId,
         ref: "users",
         required: true,
     },
-    fullName: {
+    name: {
         type: String,
         required: true,
     },
@@ -26,7 +26,7 @@ const reportBugSchema = new Schema({
         type: String,
         required: true,
     },
-    screenshotUrl: {
+    screenshot: {
         type: String,
         required: true,
     },
