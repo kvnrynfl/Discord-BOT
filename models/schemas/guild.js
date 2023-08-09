@@ -15,6 +15,10 @@ const guildSchema = new Schema({
         type: Types.ObjectId,
         ref: "users",
     },
+    whitelist: {
+        type: Boolean,
+        default: false,
+    },
     registerAt: {
         type: Date,
         required: true,
