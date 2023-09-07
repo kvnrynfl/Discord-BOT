@@ -1,6 +1,8 @@
 /node_modules
-/commands/developer/*
-.env
-config.json
 package-lock.json
-Dev*.txt
+config.json
+.env
+
+/commands/developer/
+/events/player/OLD/
+/dev-note/
