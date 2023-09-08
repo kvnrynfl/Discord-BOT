@@ -22,7 +22,7 @@ async function findDataUser(userId) {
     }
 }
 
-async function inputDataUser(userid, globalName, username, discriminator, register_at) {
+async function inputDataUser(userId, globalName, username, discriminator, register_at) {
     try {
         const user = new users({
             userId: userId,
