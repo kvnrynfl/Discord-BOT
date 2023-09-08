@@ -1,30 +1,34 @@
 const { Schema } = require("mongoose");
 
 const userSchema = new Schema({
-    id: {
+    userId: {
         type: Number,
         index: true,
         unique: true,
         required: true,
     },
-    name: {
+    globalName: {
         type: String,
         required: true,
     },
-    tag: {
+    username: {
+        type: String,
+        required: true,
+    },
+    discriminator: {
         type: Number,
         required: true,
     },
-    registerAt: {
+    register_at: {
         type: Date,
         required: true,
     },
-    createdAt: {
+    created_at: {
         type: Date,
         default: () => Date.now(),
         immutable: true,
     },
-    updatedAt: Date,
+    updated_at: Date,
 });
 
 userSchema.pre('save', function (next) {
